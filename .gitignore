@@ -1,0 +1,24 @@
+#### eclipse data ####
+
+eclipse-workspace
+*.project
+*.classpath
+*.settings
+ 
+#### netbeans data ####
+
+core/workflow/data
+nb-configuration.xml
+nbactions.xml
+
+#### maven data ####
+
+*target
+
+#### compiled data ####
+*.class
+
+#### Package Files ####
+*.jar
+*.war
+*.ear
