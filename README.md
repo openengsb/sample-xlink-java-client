@@ -47,9 +47,14 @@ Accepted Constraints are
 
 Implemented Functionality
 ==========================
-- TBW
+- Client automatically connects to the OpenEngSB and registers for XLink
+- .sql Files in the WorkingDirectory can be opened and CreateStatements are viewed in a List
+- For each Statement, details can be displayed
+- Via a PopUp-Menu (right-click on a Statement), a valid XLink-URL is copied into the clipboard
+- Incoming potential Matches are searched in the WorkingDirectory and, if found, the most likely match is displayed.
+- Incoming updates about other local tools that support XLink are processed. 
 
 Not yet Implemented Functionality
 ==========================
 - 'Local Switch' functionality
-- Adding of 'Create Statements'
+- Creation of Statements
