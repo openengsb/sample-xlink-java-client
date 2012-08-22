@@ -1,6 +1,7 @@
 package org.openengsb.xlinkSQLViewer.xlink;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,7 +60,7 @@ public class XLinkConnector implements SQLCodeDomain, Connector {
 	@Override
 	public void onRegisteredToolsUpdateEvent(RegisteredToolsUpdateEvent e) {
 		logger.debug("'onRegisteredToolsUpdateEvent' was triggered from the OpenEngSB");
-		fetchTemplate().setRegisteredTools(e.getRegisteredTools());
+		fetchTemplate().setRegisteredTools(Arrays.asList(e.getRegisteredTools()));
 	}
 
 	/**

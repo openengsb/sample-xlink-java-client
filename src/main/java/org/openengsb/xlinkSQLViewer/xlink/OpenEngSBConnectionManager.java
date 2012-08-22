@@ -12,6 +12,7 @@ import org.openengsb.connector.usernamepassword.Password;
 import org.openengsb.core.api.ConnectorManager;
 import org.openengsb.core.api.ConnectorValidationFailedException;
 import org.openengsb.core.api.model.ModelDescription;
+import org.openengsb.core.api.xlink.exceptions.DomainNotLinkableException;
 import org.openengsb.core.api.xlink.model.ModelToViewsTuple;
 import org.openengsb.core.api.xlink.model.RemoteToolView;
 import org.openengsb.core.api.xlink.model.XLinkTemplate;
@@ -94,8 +95,9 @@ public class OpenEngSBConnectionManager {
 
 	/***
 	 * Creates/Registers the connector at the OpenEngSB and registers the connector to XLink
+	 * @throws DomainNotLinkableException 
 	 */
-	public void connectToOpenEngSbWithXLink(SqlViewerGUI gui) throws JMSException, ConnectorValidationFailedException{
+	public void connectToOpenEngSbWithXLink(SqlViewerGUI gui) throws JMSException, ConnectorValidationFailedException, DomainNotLinkableException{
         /*Create/Register the connector*/
 		jmsConfig = new JmsProtocolHandler(xlinkBaseUrl);
         domainFactory = new ProxyConnectorFactory(jmsConfig, openengsbUser, new Password(openengsbPassword));
