@@ -135,7 +135,6 @@ public class XLinkConnector implements SQLCodeDomain, Connector {
 		Matcher foreingKeyMatcher = listPattern.matcher(replaced);
 		
 		while(foreingKeyMatcher.find()){
-			System.out.println("found");
 			String foundList = foreingKeyMatcher.group(0);
 			//singleList Replace
 			String replacedList = foundList.replaceAll("\\[([\\w |REFERENCES [a-zA-Z]+\\([a-zA-Z]+\\)]+)\\]", "\\[\"$1\"\\]");

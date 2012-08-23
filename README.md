@@ -56,5 +56,7 @@ Implemented Functionality
 
 Not yet Implemented Functionality
 ==========================
+- onRegisteredToolsUpdateEvent has not been tested yet
+- enable hostIP/Hostname choosing
 - 'Local Switch' functionality
 - Creation of Statements
