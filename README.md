@@ -31,9 +31,9 @@ The Program filters SQL CreateStatements in this abstract syntax
 
 A Statement is of the structure
 
-CREATE TABLE <TABLENAME>
+CREATE TABLE 'TABLENAME'
 (
- <fieldName> <dataType> <listOfConstraints>,
+ 'fieldName' 'dataType' 'listOfConstraints',
 );
 
 Make sure that the opening and closing bracket have no leading or trailing spaces.
@@ -42,7 +42,7 @@ Every fieldDefintion must be written in it´s own row.
 Accepted Constraints are
  PRIMARY KEY
  NOT NULL
- REFERENCES <tableName>(<fieldName>)
+ REFERENCES 'tableName'('fieldName')
 
 
 Implemented Functionality
