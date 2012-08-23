@@ -25,6 +25,13 @@ and 'log4j.properties' into the same directory as your .jar
 
 - Start the Java-Client
 
+!!CAUTION!! 
+Every Tool must provide it´s HostID during the registration.
+Currently this is hardcoded with 'localhost', so you can only test this, wenn Server and Client are on the same host.
+This limitation will be removed soon.
+!!CAUTION!! 
+
+
 Structure of accepted SQL files
 ==========================
 The Program filters SQL CreateStatements in this abstract syntax
