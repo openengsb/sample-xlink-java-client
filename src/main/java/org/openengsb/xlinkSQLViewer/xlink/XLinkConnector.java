@@ -1,21 +1,16 @@
 package org.openengsb.xlinkSQLViewer.xlink;
 
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openengsb.core.api.AliveState;
 import org.openengsb.core.api.Connector;
 import org.openengsb.core.api.model.ModelDescription;
 import org.openengsb.core.api.xlink.events.RegisteredToolsUpdateEvent;
 import org.openengsb.core.api.xlink.model.XLinkTemplate;
-import org.openengsb.core.common.util.JsonUtils;
 import org.openengsb.domain.SQLCode.SQLCodeDomain;
 import org.openengsb.domain.SQLCode.model.SQLCreate;
 import org.openengsb.xlinkSQLViewer.ui.SqlViewerGUI;

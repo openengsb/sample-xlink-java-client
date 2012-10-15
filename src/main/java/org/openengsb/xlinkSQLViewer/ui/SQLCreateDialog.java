@@ -16,9 +16,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import org.openengsb.xlinkSQLViewer.model.SQLCreateModel;
-
 import net.miginfocom.swing.MigLayout;
+
+import org.openengsb.xlinkSQLViewer.model.SQLCreateModel;
 
 /**
  * Simple Dialog which enables the User to insert new CreateStatements
