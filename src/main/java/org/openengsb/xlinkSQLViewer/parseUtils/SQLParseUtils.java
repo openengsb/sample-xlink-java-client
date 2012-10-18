@@ -16,7 +16,7 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openengsb.core.api.model.ModelDescription;
-import org.openengsb.core.api.xlink.model.XLinkTemplate;
+import org.openengsb.core.api.xlink.model.XLinkUrlBlueprint;
 import org.openengsb.domain.SQLCode.model.SQLCreate;
 import org.openengsb.domain.SQLCode.model.SQLCreateField;
 import org.openengsb.xlinkSQLViewer.exceptions.GenerateXLinkException;
@@ -171,10 +171,10 @@ public final class SQLParseUtils {
     }
     
 	/**
-	 * Fetches the XLinkTemple from the ConnectorManager
+	 * Fetches the XLinkUrlBlueprint from the ConnectorManager
 	 */
-	private static XLinkTemplate fetchTemplate(){
-		return OpenEngSBConnectionManager.getInstance().getTemplate();
+	private static XLinkUrlBlueprint fetchTemplate(){
+		return OpenEngSBConnectionManager.getInstance().getBluePrint();
 	}
 
 }

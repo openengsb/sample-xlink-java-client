@@ -14,8 +14,8 @@ import org.openengsb.core.api.ConnectorValidationFailedException;
 import org.openengsb.core.api.model.ModelDescription;
 import org.openengsb.core.api.xlink.exceptions.DomainNotLinkableException;
 import org.openengsb.core.api.xlink.model.ModelToViewsTuple;
-import org.openengsb.core.api.xlink.model.RemoteToolView;
-import org.openengsb.core.api.xlink.model.XLinkTemplate;
+import org.openengsb.core.api.xlink.model.XLinkConnectorView;
+import org.openengsb.core.api.xlink.model.XLinkUrlBlueprint;
 import org.openengsb.domain.SQLCode.SQLCodeDomainEvents;
 import org.openengsb.domain.SQLCode.model.SQLCreate;
 import org.openengsb.loom.java.ProxyConnectorFactory;
@@ -51,8 +51,8 @@ public class OpenEngSBConnectionManager {
     /**Hostname of the local system, used to identify the Host during an XLink call*/
     private String hostname;
     
-    /**XLinkTemplate received during XLinkRegistration*/
-    private XLinkTemplate template;
+    /**XLinkUrlBlueprint received during XLinkRegistration*/
+    private XLinkUrlBlueprint blueprint;
     
     /**Proxy EventInterface to send events to the OpenEngSB*/
     private SQLCodeDomainEvents domainEvents;
@@ -102,7 +102,7 @@ public class OpenEngSBConnectionManager {
 		jmsConfig = new JmsProtocolHandler(xlinkBaseUrl);
         domainFactory = new ProxyConnectorFactory(jmsConfig, openengsbUser, new Password(openengsbPassword));
         connectorUUID = domainFactory.createConnector(domainId);
-        XLinkConnector handler = new XLinkConnector(gui);
+        LinkableConnector handler = new LinkableConnector(gui);
         domainFactory.registerConnector(connectorUUID, handler);
         
         /*Fetch Event Interface*/
@@ -110,7 +110,7 @@ public class OpenEngSBConnectionManager {
         
         /*Register to XLink*/
         cm = domainFactory.getRemoteProxy(ConnectorManager.class, null);     
-        template = cm.connectToXLink(connectorUUID, hostname, 
+        blueprint = cm.connectToXLink(connectorUUID, hostname, 
         		programname, initModelViewRelation());
         
 		connected = true;
@@ -127,8 +127,8 @@ public class OpenEngSBConnectionManager {
 	    Map<String, String> descriptions  = new HashMap<String, String>();
 	    descriptions.put("en", "This view opens the values in a SQLViewer.");
 	    descriptions.put("de", "Dieses Tool öffnet die Werte in einem SQLViewer.");
-	    List<RemoteToolView> views = new ArrayList<RemoteToolView>();
-	    views.add(new RemoteToolView(SqlViewerGUI.viewId, SqlViewerGUI.viewName, descriptions));         
+	    List<XLinkConnectorView> views = new ArrayList<XLinkConnectorView>();
+	    views.add(new XLinkConnectorView(SqlViewerGUI.viewId, SqlViewerGUI.viewName, descriptions));         
 	    modelsToViews[0] = 
 	            new ModelToViewsTuple(
 	                    new ModelDescription(
@@ -171,8 +171,8 @@ public class OpenEngSBConnectionManager {
     	logger.info("disconnected from openEngSB and XLink");
 	}
 
-	public XLinkTemplate getTemplate() {
-		return template;
+	public XLinkUrlBlueprint getBluePrint() {
+		return blueprint;
 	}
 	
 }
