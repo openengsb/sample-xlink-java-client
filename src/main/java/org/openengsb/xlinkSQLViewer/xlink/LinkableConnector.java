@@ -62,31 +62,35 @@ public class LinkableConnector implements SQLCodeDomain, Connector {
 	 * Local matches are searched and displayed.
 	 */
 	@Override
-	public void openXLinks(Object[] potentialMatch, String viewId) {
-		if(!SqlViewerGUI.viewId.equals(viewId)){
-			logger.warn("An XLink matching was triggerd with an unknown viewId.");
-			gui.showXLinkMissMatch("An XLink matching was triggerd with an unknown viewId.");
-			return;
-		}
-		ModelDescription modelInformation = fetchTemplate().getViewToModels().get(viewId);
-		/*The Model 'SQLCreate' is the only accepted Model here*/
-		if(modelInformation.getModelClassName().equals(SQLCreate.class.getName())){
-			for(Object match : potentialMatch){
-				SQLCreate currentMatch = convertToCreate(match.toString());
-				if(currentMatch != null){
-					MatchingResult foundMatch = matchLogic.findMostPotentialLocalMatch(currentMatch);
-					if(foundMatch != null){
-						gui.openXLinkMatch(foundMatch);
-						return;
-					}
+	public void openXLinks(final Object[] potentialMatch, final String viewId) {
+		new Thread(new Runnable() {
+			public void run() {
+				if(!SqlViewerGUI.viewId.equals(viewId)){
+					logger.warn("An XLink matching was triggerd with an unknown viewId.");
+					gui.showXLinkMissMatch("An XLink matching was triggerd with an unknown viewId.");
+					return;
 				}
-			}
-		}else{
-			logger.warn("An XLink matching was triggered, but the defined model is not supported");
-			gui.showXLinkMissMatch("An XLink matching was triggered, but the defined model is not supported");
-		}
-		logger.warn("An XLink matching was triggered, but no match was found.");
-		gui.showXLinkMissMatch("An XLink matching was triggered, but no match was found.");
+				ModelDescription modelInformation = fetchTemplate().getViewToModels().get(viewId);
+				/*The Model 'SQLCreate' is the only accepted Model here*/
+				if(modelInformation.getModelClassName().equals(SQLCreate.class.getName())){
+					for(Object match : potentialMatch){
+						SQLCreate currentMatch = convertToCreate(match.toString());
+						if(currentMatch != null){
+							MatchingResult foundMatch = matchLogic.findMostPotentialLocalMatch(currentMatch);
+							if(foundMatch != null){
+								gui.openXLinkMatch(foundMatch);
+								return;
+							}
+						}
+					}
+				}else{
+					logger.warn("An XLink matching was triggered, but the defined model is not supported");
+					gui.showXLinkMissMatch("An XLink matching was triggered, but the defined model is not supported");
+				}
+				logger.warn("An XLink matching was triggered, but no match was found.");
+				gui.showXLinkMissMatch("An XLink matching was triggered, but no match was found.");
+             }
+			}).start();
 	}
 	
 	/**

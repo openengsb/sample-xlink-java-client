@@ -85,8 +85,6 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner{
     
     /**Currently selected Statements*/
     private SQLCreateModel selectedStmt;
-
-	private JFrame refToSelf;
 	
 	public SqlViewerGUI(File workingDirectory, String openEngSBContext){
 		super();
@@ -109,7 +107,7 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner{
 		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fc.setFileFilter(new SqlFileFilter());
 		
-		refToSelf = this;
+		//refToSelf = this;
 		
 		customActionHandler = new CustomActionHandler();
 		
@@ -299,7 +297,7 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner{
 	    		int index = sqlList.locationToIndex(e.getPoint());
 	    		SQLCreateModel createStmt = (SQLCreateModel) sqlList.getModel().getElementAt(index);
 	    		sqlList.ensureIndexIsVisible(index);
-	    		new SQLCreateDialog(refToSelf,createStmt);
+	    		new SQLCreateDialog(SqlViewerGUI.this,createStmt);
 	    	}
 	    }	
 	}
@@ -329,7 +327,7 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner{
 	            }
 			}
 			if(e.getSource() == close){
-				getToolkit().getSystemEventQueue().postEvent(new WindowEvent(refToSelf, WindowEvent.WINDOW_CLOSING));
+				getToolkit().getSystemEventQueue().postEvent(new WindowEvent(SqlViewerGUI.this, WindowEvent.WINDOW_CLOSING));
 			}		
 			if(e.getSource() == extractXLink){
 				if(SqlCreateViewer.isConnected()){
@@ -338,13 +336,13 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner{
 						try {
 							stringSelection = new StringSelection(SQLParseUtils.genereateXLink(selectedStmt, openEngSBContext));
 							Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-						    clipboard.setContents( stringSelection, (ClipboardOwner) refToSelf );
+						    clipboard.setContents( stringSelection, (ClipboardOwner) SqlViewerGUI.this );
 						} catch (Exception ex){
 							handleErrorVisualy("Error during XLink creation.", ex);
 						}
 					}
 				}else{
-					JOptionPane.showMessageDialog(refToSelf,
+					JOptionPane.showMessageDialog(SqlViewerGUI.this,
 							"No Connection",
 							"Connection to OpenEngSb has not been established.",
 						    JOptionPane.INFORMATION_MESSAGE);

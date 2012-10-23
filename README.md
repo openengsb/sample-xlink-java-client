@@ -63,7 +63,7 @@ Implemented Functionality
 
 Not yet Implemented Functionality
 ==========================
-- onRegisteredToolsUpdateEvent has not been tested yet
+- onRegisteredToolsChanged has not been tested yet (see Issue OPENENGSB-3268)
 - enable hostIP/Hostname choosing
 - 'Local Switch' functionality
 - Creation of Statements

@@ -48,8 +48,8 @@ public class OpenEngSBConnectionManager {
     /**Flag indicating the connection status*/
     private boolean connected = false;
     
-    /**Hostname of the local system, used to identify the Host during an XLink call*/
-    private String hostname;
+    /**HostIP of the local system, used to identify the Host during an XLink call*/
+    private String hostIp;
     
     /**XLinkUrlBlueprint received during XLinkRegistration*/
     private XLinkUrlBlueprint blueprint;
@@ -68,7 +68,7 @@ public class OpenEngSBConnectionManager {
 		this.domainId = domainId;
 		this.programname = programname;
 		this.connected = false;
-		this.hostname = "localhost";//getHostName();
+		this.hostIp = "127.0.0.1";
 		this.openengsbUser = openengsbUser;
 		this.openengsbPassword = openengsbPassword;
 	}	
@@ -97,7 +97,7 @@ public class OpenEngSBConnectionManager {
 	 * Creates/Registers the connector at the OpenEngSB and registers the connector to XLink
 	 * @throws DomainNotLinkableException 
 	 */
-	public void connectToOpenEngSbWithXLink(SqlViewerGUI gui) throws JMSException, ConnectorValidationFailedException, DomainNotLinkableException{
+	public void connectToOpenEngSbWithXLink(SqlViewerGUI gui) throws JMSException, ConnectorValidationFailedException {
         /*Create/Register the connector*/
 		jmsConfig = new JmsProtocolHandler(xlinkBaseUrl);
         domainFactory = new ProxyConnectorFactory(jmsConfig, openengsbUser, new Password(openengsbPassword));
@@ -110,7 +110,7 @@ public class OpenEngSBConnectionManager {
         
         /*Register to XLink*/
         cm = domainFactory.getRemoteProxy(ConnectorManager.class, null);     
-        blueprint = cm.connectToXLink(connectorUUID, hostname, 
+        blueprint = cm.connectToXLink(connectorUUID, hostIp, 
         		programname, initModelViewRelation());
         
 		connected = true;
@@ -164,7 +164,7 @@ public class OpenEngSBConnectionManager {
 	 * Unregisters the connector from XLink and removes it from the OpenEngSB
 	 */
 	public void disconnect(){
-		cm.disconnectFromXLink(connectorUUID, hostname);
+		cm.disconnectFromXLink(connectorUUID, hostIp);
 		domainFactory.unregisterConnector(connectorUUID);
     	domainFactory.deleteConnector(connectorUUID);
     	jmsConfig.destroy();
