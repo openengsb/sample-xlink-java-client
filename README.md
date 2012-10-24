@@ -17,20 +17,15 @@ and 'log4j.properties' into the same directory as your .jar
 
 - Configure the program arguments in 'application.properties'
 	1) Change Username, Password and Context if necessary.
-	2) If the OpenEngSB Server is not running on your local machine, the 'xlink.baseUrl' has to be changed as well.
-	3) Set the 'working.dir' to a local directory.
-	4) Copy the 'creates.sql' to this directory.
+	2) If the OpenEngSB Server is not running on your local machine, the 'openengsb.hostIp' has to be changed to the Ip of the
+	   network interface that connects to the server (default is 127.0.0.1).
+	3) If the OpenEngSB Server is not running on your local machine, the 'xlink.baseUrl' has to be changed as well.
+	4) Set the 'working.dir' to a local directory.
+	5) Copy the 'creates.sql' to this directory.
 
 - Start the OpenEngSB server and make sure that the JMS-Port bundle is installed
 
 - Start the Java-Client
-
-!!CAUTION!! 
-Every Tool must provide it´s HostID during the registration.
-Currently this is hardcoded with 'localhost', so you can only test this, wenn Server and Client are on the same host.
-This limitation will be removed soon.
-!!CAUTION!! 
-
 
 Structure of accepted SQL files
 ==========================
@@ -64,6 +59,5 @@ Implemented Functionality
 Not yet Implemented Functionality
 ==========================
 - onRegisteredToolsChanged has not been tested yet (see Issue OPENENGSB-3268)
-- enable hostIP/Hostname choosing
 - 'Local Switch' functionality
 - Creation of Statements

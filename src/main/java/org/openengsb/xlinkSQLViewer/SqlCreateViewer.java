@@ -48,6 +48,7 @@ public class SqlCreateViewer {
     private static File workingDirFile;
     private static String openengsbUser;
     private static String openengsbPassword;
+    private static String openengsbHostIp;
     
     private static Logger logger = Logger.getLogger(SqlCreateViewer.class.getName());
    
@@ -66,7 +67,7 @@ public class SqlCreateViewer {
 		});
 		
 		OpenEngSBConnectionManager.initInstance(xlinkBaseUrl, domainId, programname,
-				openengsbUser, openengsbPassword);
+				openengsbUser, openengsbPassword, openengsbHostIp);
 		try{
 			OpenEngSBConnectionManager.getInstance().connectToOpenEngSbWithXLink(gui);
 		}catch(Exception e){
@@ -191,6 +192,11 @@ public class SqlCreateViewer {
 	    			openengsbPassword = registryEntries.getProperty("openengsb.password");
 	    		}else{
 	    			throw new Exception("OpenEngSb Password (parameter 'openengsb.password') must be set.");
+	    		}
+	    		if(registryEntries.getProperty("openengsb.hostIp")!=null){
+	    			openengsbHostIp = registryEntries.getProperty("openengsb.hostIp");
+	    		}else{
+	    			openengsbHostIp = "127.0.0.1";
 	    		}
 		    	in.close();
 	    	} else {

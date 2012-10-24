@@ -62,13 +62,14 @@ public class OpenEngSBConnectionManager {
 	
 	private OpenEngSBConnectionManager(String xlinkBaseUrl, 
 			String domainId, String programname,
-			String openengsbUser, String openengsbPassword) {
+			String openengsbUser, String openengsbPassword,
+			String hostIp) {
 		super();
 		this.xlinkBaseUrl = xlinkBaseUrl;
 		this.domainId = domainId;
 		this.programname = programname;
 		this.connected = false;
-		this.hostIp = "127.0.0.1";
+		this.hostIp = hostIp;
 		this.openengsbUser = openengsbUser;
 		this.openengsbPassword = openengsbPassword;
 	}	
@@ -78,9 +79,10 @@ public class OpenEngSBConnectionManager {
 	 */
 	public static void initInstance(String xlinkBaseUrl, 
 			String domainId, String programname, 
-			String openengsbUser, String openengsbPassword) {
+			String openengsbUser, String openengsbPassword, 
+			String hostIp) {
 		instance = new OpenEngSBConnectionManager(xlinkBaseUrl, domainId, 
-				programname, openengsbUser, openengsbPassword);
+				programname, openengsbUser, openengsbPassword, hostIp);
 	}	
 	
 	/**
