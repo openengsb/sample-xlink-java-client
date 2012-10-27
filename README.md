@@ -15,15 +15,15 @@ How to configure & build
 - To run the program, got to 'target/classes' and copy the files 'application.properties' 
 and 'log4j.properties' into the same directory as your .jar
 
-- Configure the program arguments in 'application.properties'
-	1) Change Username, Password and Context if necessary.
-	2) If the OpenEngSB Server is not running on your local machine, the 'openengsb.hostIp' has to be changed to the Ip of the
-	   network interface that connects to the server (default is 127.0.0.1).
-	3) If the OpenEngSB Server is not running on your local machine, the 'xlink.baseUrl' has to be changed as well.
-	4) Set the 'working.dir' to a local directory.
-	5) Copy the 'creates.sql' to this directory.
+- Configure the program arguments in 'application.properties'<br/>
+	1) Change Username, Password and Context if necessary.<br/>
+	2) If the OpenEngSB Server is not running on your local machine, the 'openengsb.hostIp' has to be changed to the Ip of the<br/>
+	   network interface that connects to the server (default is 127.0.0.1).<br/>
+	3) If the OpenEngSB Server is not running on your local machine, the 'xlink.baseUrl' has to be changed as well.<br/>
+	4) Set the 'working.dir' to a local directory.<br/>
+	5) Copy the 'creates.sql' to this directory.<br/>
 
-- Start the OpenEngSB server and make sure that the JMS-Port bundle is installed
+- Start the OpenEngSB server and make sure that the JMS-Port bundle is installed<br/>
 Note that, if server and client are not running on the same machine, the xlink base-URL (e.g. contains also the server URL) must
 be configured in $OPENENGSB_HOME$/etc/org.openengsb.core.services.internal.connectormanager.cfg
 
