@@ -24,6 +24,8 @@ and 'log4j.properties' into the same directory as your .jar
 	5) Copy the 'creates.sql' to this directory.
 
 - Start the OpenEngSB server and make sure that the JMS-Port bundle is installed
+Note that, if server and client are not running on the same machine, the xlink base-URL (e.g. contains also the server URL) must
+be configured in $OPENENGSB_HOME$/etc/org.openengsb.core.services.internal.connectormanager.cfg
 
 - Start the Java-Client
 
