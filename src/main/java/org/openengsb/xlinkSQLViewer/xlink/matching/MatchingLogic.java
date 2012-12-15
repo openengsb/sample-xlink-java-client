@@ -91,7 +91,7 @@ public class MatchingLogic {
 		directoriesAndFilesToSearch.addAll(Arrays.asList(rootDirectory.listFiles(bfsFileFilter)));
 	}
 	
-	/**Returns the index of the first SQLCreateModel object which matches the SQLCreate´s object tableName*/
+	/**Returns the index of the first SQLCreateModel object which matches the SQLCreate's object tableName*/
 	private int findIndexOfCreateStmt(List<SQLCreateModel> createList, SQLCreate stmt){
 		int index = 0;
 		for(SQLCreateModel create : createList){

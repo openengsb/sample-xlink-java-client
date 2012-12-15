@@ -95,7 +95,7 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner{
 	}
 	
 	/**
-	 * Init큦 the Items of the GUI
+	 * Init's the Items of the GUI
 	 */
 	private void initItems(){
 		header = new JLabel("No File openend.");
@@ -147,7 +147,7 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner{
 	}	
 
 	/**
-	 * Init큦 the Popup Menu for the List
+	 * Init's the Popup Menu for the List
 	 */
 	private void initPopupMenu(){
 		popup = new JPopupMenu();
@@ -157,7 +157,7 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner{
 	}
 	
 	/**
-	 * Init큦 the Menu for the MenuBar
+	 * Init's the Menu for the MenuBar
 	 */
 	private void initMenu(){
         menueLeiste = new JMenuBar();
@@ -179,7 +179,7 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner{
 	}
 	
 	/**
-	 * Init큦 the List to display the opened SQL Statements in.
+	 * Init's the List to display the opened SQL Statements in.
 	 */
 	private void buildList(){
 		sqlList = new JList();
@@ -270,7 +270,7 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner{
 	
 	/**
 	 * MouseAdapter to handle the selection of a ListElement.
-	 * Manages the PopupMenu and the Doubleclick to open the Statement큦 Details
+	 * Manages the PopupMenu and the Doubleclick to open the Statement's Details
 	 */
 	private class SqlListMouseListener extends MouseAdapter {
 	    public void mousePressed(MouseEvent e) {

@@ -205,7 +205,7 @@ public class SqlCreateViewer {
     	} catch(IOException ex){
     		writeErrorAndExit("The properties file '"+propertiesFile+"' was not found.\n",ex);
     	} catch(NumberFormatException e){
-    		writeErrorAndExit("One of the values of the properties file, doesn´t have the correct format.\n",e);
+    		writeErrorAndExit("One of the values of the properties file, doesn't have the correct format.\n",e);
     	} catch(Exception e3){
     		writeErrorAndExit("An exception occured during startup.\n",e3);
     	} finally{

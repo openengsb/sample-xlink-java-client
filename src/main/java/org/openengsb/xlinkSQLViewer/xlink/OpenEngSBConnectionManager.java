@@ -22,7 +22,6 @@ import org.openengsb.loom.java.ProxyConnectorFactory;
 import org.openengsb.loom.java.jms.JmsProtocolHandler;
 import org.openengsb.xlinkSQLViewer.ui.SqlViewerGUI;
 
-
 /**
  * ConnectionManager for the OpenEngSB
  */
@@ -128,7 +127,7 @@ public class OpenEngSBConnectionManager {
 	    	= new ModelToViewsTuple[1];  
 	    Map<String, String> descriptions  = new HashMap<String, String>();
 	    descriptions.put("en", "This view opens the values in a SQLViewer.");
-	    descriptions.put("de", "Dieses Tool öffnet die Werte in einem SQLViewer.");
+	    descriptions.put("de", "Dieses Tool oeffnet die Werte in einem SQLViewer.");
 	    List<XLinkConnectorView> views = new ArrayList<XLinkConnectorView>();
 	    views.add(new XLinkConnectorView(SqlViewerGUI.viewId, SqlViewerGUI.viewName, descriptions));         
 	    modelsToViews[0] = 
