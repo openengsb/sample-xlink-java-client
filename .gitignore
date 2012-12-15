@@ -4,7 +4,12 @@ eclipse-workspace
 *.project
 *.classpath
 *.settings
- 
+
+#### intellij data ####
+
+*.iml
+*.idea
+
 #### netbeans data ####
 
 core/workflow/data
