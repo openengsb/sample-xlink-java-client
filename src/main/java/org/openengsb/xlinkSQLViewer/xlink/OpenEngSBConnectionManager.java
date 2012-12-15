@@ -100,7 +100,7 @@ public class OpenEngSBConnectionManager {
 	 */
 	public void connectToOpenEngSbWithXLink(SqlViewerGUI gui) throws JMSException, ConnectorValidationFailedException {
         /*Create/Register the connector*/
-		jmsConfig = new JmsProtocolHandler(xlinkBaseUrl);
+        jmsConfig = new JmsProtocolHandler(xlinkBaseUrl, "sample-xlink-java-client");
         domainFactory = new ProxyConnectorFactory(jmsConfig, openengsbUser, new Password(openengsbPassword));
         connectorUUID = domainFactory.createConnector(domainId);
         LinkableConnector handler = new LinkableConnector(gui);
