@@ -29,13 +29,13 @@ public class OpenEngSBConnectionManager {
 	
 	private static Logger logger = Logger.getLogger(OpenEngSBConnectionManager.class.getName());
 	
-	/*Supplied program arguments*/
+	/*XLink variables*/
     private ProxyConnectorFactory domainFactory;
     private JmsProtocolHandler jmsConfig;
     private ConnectorManager cm;
     
     /*Supplied program arguments*/
-    private String xlinkBaseUrl;
+    private String xlinkServerURL;
     private String domainId;
     private String programname;  
     private String openengsbUser;
@@ -59,12 +59,12 @@ public class OpenEngSBConnectionManager {
 	/** Only possible OpenEngSBConnectionManager instance */
 	private static OpenEngSBConnectionManager instance = null;
 	
-	private OpenEngSBConnectionManager(String xlinkBaseUrl, 
+	private OpenEngSBConnectionManager(String xlinkServerURL, 
 			String domainId, String programname,
 			String openengsbUser, String openengsbPassword,
 			String hostIp) {
 		super();
-		this.xlinkBaseUrl = xlinkBaseUrl;
+		this.xlinkServerURL = xlinkServerURL;
 		this.domainId = domainId;
 		this.programname = programname;
 		this.connected = false;
@@ -100,7 +100,7 @@ public class OpenEngSBConnectionManager {
 	 */
 	public void connectToOpenEngSbWithXLink(SqlViewerGUI gui) throws JMSException, ConnectorValidationFailedException {
         /*Create/Register the connector*/
-        jmsConfig = new JmsProtocolHandler(xlinkBaseUrl, "sample-xlink-java-client");
+        jmsConfig = new JmsProtocolHandler(xlinkServerURL, "sample-xlink-java-client");
         domainFactory = new ProxyConnectorFactory(jmsConfig, openengsbUser, new Password(openengsbPassword));
         connectorUUID = domainFactory.createConnector(domainId);
         LinkableConnector handler = new LinkableConnector(gui);

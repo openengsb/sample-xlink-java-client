@@ -42,7 +42,7 @@ public class SqlCreateViewer {
     private static String programname = "XLinkJavaClient";    
     
     /*Supplied program arguments*/
-    private static String xlinkBaseUrl;
+    private static String xlinkServerURL;
     private static String openEngSBContext;
     private static String domainId;
     private static File workingDirFile;
@@ -66,7 +66,7 @@ public class SqlCreateViewer {
 			}
 		});
 		
-		OpenEngSBConnectionManager.initInstance(xlinkBaseUrl, domainId, programname,
+		OpenEngSBConnectionManager.initInstance(xlinkServerURL, domainId, programname,
 				openengsbUser, openengsbPassword, openengsbHostIp);
 		try{
 			OpenEngSBConnectionManager.getInstance().connectToOpenEngSbWithXLink(gui);
@@ -166,10 +166,10 @@ public class SqlCreateViewer {
 	    		}else{
 	    			throw new Exception("WorkingDirectory (parameter 'working.dir') must be set.");
 	    		}
-	    		if(registryEntries.getProperty("xlink.baseUrl")!=null){
-	    			xlinkBaseUrl = registryEntries.getProperty("xlink.baseUrl");
+	    		if(registryEntries.getProperty("xlink.xlinkServerURL")!=null){
+	    			xlinkServerURL = registryEntries.getProperty("xlink.xlinkServerURL");
 	    		}else{
-	    			throw new Exception("XLinkUrl (parameter 'xlink.baseUrl') must be set.");
+	    			throw new Exception("XLinkUrl (parameter 'xlink.xlinkServerURL') must be set.");
 	    		}
 	    		
 	    		if(registryEntries.getProperty("openengsb.context")!=null){
