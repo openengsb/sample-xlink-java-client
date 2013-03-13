@@ -112,7 +112,7 @@ public final class SQLParseUtils {
         
         ObjectMapper mapper = new ObjectMapper();
         String  objectString = mapper.writeValueAsString(emtpyCreate);
-        
+        System.out.println("objectString "+objectString);
         completeUrl += "&" + fetchTemplate().getKeyNames().getIdentifierKeyName() + "=" + urlEncodeParameter(objectString);
 
         System.out.println("objectString "+objectString);
