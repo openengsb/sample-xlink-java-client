@@ -168,7 +168,7 @@ public class MatchingLogic {
 		for (int i = 0; i < currentMatchingResult.getCreateStatements().size(); i++) {
 			int currentMatchValue = matchValueOfCreate(currentMatchingResult
 					.getCreateStatements().get(i), xlinkStmt);
-			if(currentMatchValue > maxMatchValue){
+			if (currentMatchValue > maxMatchValue) {
 				maxMatchValue = currentMatchValue;
 			}
 		}
