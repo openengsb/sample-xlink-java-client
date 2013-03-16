@@ -131,12 +131,9 @@ public final class SQLParseUtils {
 
 		ObjectMapper mapper = new ObjectMapper();
 		String objectString = mapper.writeValueAsString(emtpyCreate);
-		System.out.println("objectString " + objectString);
 		completeUrl += "&"
 				+ fetchTemplate().getKeyNames().getIdentifierKeyName() + "="
 				+ urlEncodeParameter(objectString);
-
-		System.out.println("objectString " + objectString);
 		return completeUrl;
 	}
 
@@ -144,11 +141,13 @@ public final class SQLParseUtils {
 	 * TODO TBW
 	 */
 	public static boolean triggerLocalSwitch(SQLCreateModel selectedStmt,
-			String openEngSBContext, String viewId)
+			String openEngSBContext, String connectorId, String viewId)
 			throws JsonGenerationException, JsonMappingException, IOException,
 			GenerateXLinkException {
 		String xlink = genereateXLink(selectedStmt, openEngSBContext);
-		xlink += "&" + fetchTemplate().getConnectorId() + "&"
+		// TODO remove Hack (hardcoded ConnectorIdKeyname) after correct
+		// implementation at OpenEngSB
+		xlink += "&" + "connectorId=" + connectorId + "&"
 				+ fetchTemplate().getKeyNames().getViewIdKeyName() + "="
 				+ urlEncodeParameter(viewId);
 		URL url = new URL(xlink);

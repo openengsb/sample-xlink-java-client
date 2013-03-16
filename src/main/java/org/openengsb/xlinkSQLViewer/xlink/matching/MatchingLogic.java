@@ -185,7 +185,7 @@ public class MatchingLogic {
 			String fieldRepresentation = xlinkStmt.getFields()[i]
 					.getFieldName()
 					+ " " + xlinkStmt.getFields()[i].getFieldType();
-			if (create.getCreateBody().contains(fieldRepresentation)) {
+			if (create.getCreateBody().toLowerCase().contains(fieldRepresentation.toLowerCase())) {
 				matchValue++;
 			}
 		}

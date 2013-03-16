@@ -43,6 +43,7 @@ import org.openengsb.xlinkSQLViewer.SqlCreateViewer;
 import org.openengsb.xlinkSQLViewer.exceptions.SQLFileNotWellFormedException;
 import org.openengsb.xlinkSQLViewer.model.SQLCreateModel;
 import org.openengsb.xlinkSQLViewer.parseUtils.SQLParseUtils;
+import org.openengsb.xlinkSQLViewer.ui.helper.LocalSwitchAction;
 import org.openengsb.xlinkSQLViewer.ui.helper.SingleRootFileSystemView;
 import org.openengsb.xlinkSQLViewer.ui.helper.SqlFileFilter;
 import org.openengsb.xlinkSQLViewer.xlink.OpenEngSBConnectionManager;
@@ -70,7 +71,6 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner {
 
 	private JMenuItem extractXLink;
 	private JMenu triggerLocalSwitchMenu;
-	private List<JMenuItem> currentLocalSwitchItems;
 	private JPopupMenu popup;
 
 	private JList sqlList;
@@ -114,8 +114,6 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner {
 		fc.setFileFilter(new SqlFileFilter());
 
 		customActionHandler = new CustomActionHandler();
-
-		currentLocalSwitchItems = new ArrayList<JMenuItem>();
 
 		initPopupMenu();
 		initMenu();
@@ -163,6 +161,7 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner {
 		triggerLocalSwitchMenu = new JMenu("LocalSwitch not available");
 		triggerLocalSwitchMenu.setEnabled(false);
 		popup.add(extractXLink);
+		popup.add(triggerLocalSwitchMenu);
 	}
 
 	/**
@@ -261,7 +260,6 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner {
 			triggerLocalSwitchMenu.setText("Local Switching");
 			triggerLocalSwitchMenu.setEnabled(true);
 			triggerLocalSwitchMenu.removeAll();
-			currentLocalSwitchItems = new ArrayList<JMenuItem>();
 
 			XLinkConnector[] currentLocalTools = fetchTemplate()
 					.getRegisteredTools();
@@ -271,12 +269,15 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner {
 				XLinkConnectorView[] currentLocalToolViews = currentLocalTools[i]
 						.getAvailableViews();
 				for (int e = 0; e < currentLocalToolViews.length; e++) {
-					JMenuItem newMenuItemOfTool = new JMenuItem(
-							currentLocalToolViews[e].getViewId());
+					JMenuItem newMenuItemOfTool = new JMenuItem(new LocalSwitchAction(
+							currentLocalToolViews[e].getViewId(),
+							this,
+							currentLocalTools[i].getId(),
+							currentLocalToolViews[e].getViewId()));
 					String description = getDescriptionOfView(currentLocalToolViews[e]);
 					newMenuItemOfTool.setToolTipText(description);
 					newMenuItemOfTool.addActionListener(customActionHandler);
-					currentLocalSwitchItems.add(newMenuItemOfTool);
+					toolMenu.add(newMenuItemOfTool);				
 				}
 			}
 		} else {
@@ -418,47 +419,15 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner {
 									JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
-			for (JMenuItem localSwitchItem : currentLocalSwitchItems) {
-				if (SqlCreateViewer.isConnected()) {
-					if (e.getActionCommand() == localSwitchItem.getText()) {
-						// TODO note assume that all viewIds are unique
-						String viewToSwitchTo = e.getActionCommand();
-						boolean success = false;
-						try {
-							success = SQLParseUtils.triggerLocalSwitch(
-									selectedStmt, openEngSBContext,
-									viewToSwitchTo);
-						} catch (Exception ex) {
-							handleErrorVisualy("Error during XLink creation.",
-									ex);
-							return;
-						}
-						if (success) {
-							JOptionPane
-									.showMessageDialog(
-											SqlViewerGUI.this,
-											"LocalSwitch successfull",
-											"A local switch has been successfully triggered.",
-											JOptionPane.INFORMATION_MESSAGE);
-						} else {
-							JOptionPane
-									.showMessageDialog(
-											SqlViewerGUI.this,
-											"LocalSwitch failed",
-											"A local switch was triggered, but failed.",
-											JOptionPane.INFORMATION_MESSAGE);
-						}
-					}
-				} else {
-					JOptionPane
-							.showMessageDialog(
-									SqlViewerGUI.this,
-									"No Connection",
-									"Connection to OpenEngSb has not been established.",
-									JOptionPane.INFORMATION_MESSAGE);
-				}
-			}
 		}
+	}
+
+	public String getOpenEngSBContext() {
+		return openEngSBContext;
+	}
+
+	public SQLCreateModel getSelectedStmt() {
+		return selectedStmt;
 	}
 
 	/**
