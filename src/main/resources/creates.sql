@@ -1,124 +1,105 @@
+CREATE TABLE ClientContract
+(
+  cc_Id BIGINT PRIMARY KEY,
+  company VARCHAR(150) NOT NULL,
+  orderTotal FLOAT,
+  contractAdministrator BIGINT REFERENCES ContractAdministrator(caId),
+  client BIGINT REFERENCES ContractAdministrator(caId), 
+  dateOfCreation DATE NOT NULL
+);
+
+CREATE TABLE ContractAdministrator
+(
+  ca_Id BIGINT PRIMARY KEY,
+  administratorCompany VARCHAR(150) NOT NULL,
+  department VARCHAR(150) NOT NULL,
+  contactNumber INTEGER
+);
+
+CREATE TABLE Client
+(
+  cl_Id BIGINT REFERENCES Person(pid) PRIMARY KEY,
+  numberOfContracts INTEGER,
+  creditcardNumber INTEGER,
+  bankAccountNumber INTEGER,
+  bankNumber INTEGER,
+  balance FLOAT
+);
+
+CREATE TABLE ProducedProduct
+(
+   pp_Id BIGINT PRIMARY KEY,
+   name VARCHAR(150) NOT NULL,
+   size INTEGER,
+   cost FLOAT,
+   amount INTEGER,
+   clientContract BIGINT REFERENCES ClientContract(cc_Id),
+   productStorage BIGINT REFERENCES ProductStorage(ps_Id)  
+);
+
+CREATE TABLE ProductionFacility
+(
+    pf_Id BIGINT PRIMARY KEY,
+    facilityName VARCHAR(150) NOT NULL,
+    managerName VARCHAR(200) NOT NULL
+);
+
+CREATE TABLE ProductStorage
+(
+    ps_Id BIGINT PRIMARY KEY,
+    storageName VARCHAR(150) NOT NULL,
+    storageAddress VARCHAR(300) NOT NULL
+);
+
+CREATE TABLE ProductionMachine
+(
+   pm_Id BIGINT PRIMARY KEY,
+   machineSerialId INTEGER,
+   averageOutput INTEGER,
+   purchaseDate DATE NOT NULL
+   productionFacility BIGINT REFERENCES ProductionFacility(pfId)  
+);
+
+CREATE TABLE ProductionChain
+(
+   pc_Id BIGINT PRIMARY KEY,
+   chainName VARCHAR(150) NOT NULL,
+   duration INTEGER,
+   numberOfEXecutions INTEGER
+);
+
+CREATE TABLE ProductionPlan
+(
+   pp_Id BIGINT PRIMARY KEY,
+   planName VARCHAR(150) NOT NULL,
+   creationDate DATE NOT NULL
+);
+
+CREATE TABLE ScheduledProduct
+(
+   sp_Id BIGINT PRIMARY KEY,
+   productLabel VARCHAR(150) NOT NULL,
+   count INTEGER,
+   productionDate DATE NOT NULL
+   productionMachine BIGINT REFERENCES ProductionMachine(pmId)  
+);
+
 CREATE TABLE Person
 (
- pid INTEGER PRIMARY KEY,
- vname VARCHAR(30) NOT NULL,
- nname VARCHAR(30) NOT NULL,
- gebdat DATE NOT NULL,
- adresse VARCHAR(60) NOT NULL
+  p_id BIGINT PRIMARY KEY,
+  firstName VARCHAR(30) NOT NULL,
+  lastName VARCHAR(30) NOT NULL,
+  dateOfBirth DATE NOT NULL,
+  address BIGINT REFERENCES Address(aid)
 );
 
-CREATE TABLE Kunde
+CREATE TABLE Address
 (
- kundenID INTEGER REFERENCES Person(pid),
- PRIMARY KEY(kundenID)
-);
-
-CREATE TABLE Mitarbeiter
-(
- maID INTEGER REFERENCES Person(pid) PRIMARY KEY,
- eindat DATE NOT NULL,
- gehalt SMALLINT NOT NULL,
- svnr BIGINT NOT NULL,
- kontonr INTEGER NOT NULL,
- blz INTEGER NOT NULL,
- zweigstelle VARCHAR(30) NOT NULL
-);
-
-CREATE TABLE Zweigstelle
-(
- name VARCHAR(30) PRIMARY KEY,
- email VARCHAR(30) NOT NULL,
- anschrift VARCHAR(60) NOT NULL,
- telefon INTEGER NOT NULL,
- leiter INTEGER REFERENCES Mitarbeiter(maID)
-);
-
-CREATE TABLE Entlehnkarte
-(
- nr INTEGER PRIMARY KEY,
- inhaber INTEGER REFERENCES Person(pid),
- gueltig DATE NOT NULL,
- gebuehr SMALLINT NOT NULL
-);
-
-CREATE TABLE Medium
-(
- mediennr INTEGER PRIMARY KEY,
- jahr SMALLINT NOT NULL,
- titel VARCHAR(30) NOT NULL,
- freigabe SMALLINT NOT NULL
-);
-
-CREATE TABLE Exemplar
-(
- enr INTEGER PRIMARY KEY,
- kaufdat DATE NOT NULL,
- gehoert VARCHAR(30) REFERENCES Zweigstelle(name) NOT NULL,
- medium INTEGER REFERENCES Medium(mediennr) NOT NULL
-);
-
-CREATE TABLE Kuenstler
-(
- kid INTEGER PRIMARY KEY,
- vname VARCHAR(30) NOT NULL,
- nname VARCHAR(30) NOT NULL
-);
-
-CREATE TABLE Buch
-(
- buchNr INTEGER PRIMARY KEY REFERENCES Medium(mediennr),
- umfang SMALLINT NOT NULL
-);
-
-CREATE TABLE Film
-(
- filmNr PRIMARY KEY INTEGER REFERENCES Medium(mediennr),
- format VARCHAR(3) NOT NULL,
- regisseur INTEGER REFERENCES Kuenstler(kid) NOT NULL
-);
-
-CREATE TABLE Themengebiet
-(
- themenid INTEGER PRIMARY KEY,
- name VARCHAR(50) NOT NULL
-);
-
-CREATE TABLE Entlehnung
-(
- eid INTEGER PRIMARY KEY,
- karte INTEGER REFERENCES Entlehnkarte(nr),
- adat DATE NOT NULL,
- fdat DATE NOT NULL
-);
-
-CREATE TABLE zugeordnet
-(
- medienNr INTEGER PRIMARY KEY REFERENCES Medium(mediennr),
- themenGebietID INTEGER REFERENCES Themengebiet(themenid)
-);
-
-CREATE TABLE vorgaenger
-(
- vorgaenger INTEGER REFERENCES Themengebiet(themenid) NOT NULL,
- nachfolger INTEGER PRIMARY KEY REFERENCES Themengebiet(themenid)
-);
-
-CREATE TABLE verfasst
-(
- autor INTEGER PRIMARY KEY REFERENCES Kuenstler(kid),
- buchNr INTEGER REFERENCES Buch(buchNr)
-);
-
-CREATE TABLE wird_entlehnt
-(
- entlehnungsID INTEGER PRIMARY KEY REFERENCES Entlehnung(eid),
- exemplarNr INTEGER REFERENCES Exemplar(enr)
-);
-
-CREATE TABLE rueckgabe
-(
- entlehnungsID INTEGER PRIMARY KEY REFERENCES Entlehnung(eid),
- exemplarNr INTEGER REFERENCES Exemplar(enr),
- zweigstellenID VARCHAR(30) REFERENCES Zweigstelle(name) NOT NULL,
- rdat DATE NOT NULL
+  a_id BIGINT PRIMARY KEY,
+  street VARCHAR(150) NOT NULL,
+  number INTEGER,
+  region VARCHAR(100) NOT NULL,
+  postalCode INTEGER,
+  country VARCHAR(100) NOT NULL,
+  countryCode INTEGER
 );

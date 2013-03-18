@@ -95,7 +95,11 @@ public class MatchingLogic {
 					createStmts = SQLParseUtils
 							.parseCreateStatementsFromFile(file);
 					int indexInFile = findIndexOfCreateStmt(createStmts,
-							xlinkStmt);
+							xlinkStmt, true);
+					if (indexInFile == -1) {
+						indexInFile = findIndexOfCreateStmt(createStmts,
+								xlinkStmt, false);
+					}
 					if (indexInFile != -1) {
 						matches.add(new MatchingResult(file, createStmts,
 								indexInFile));
@@ -138,12 +142,19 @@ public class MatchingLogic {
 	 * SQLCreate's object tableName
 	 */
 	private int findIndexOfCreateStmt(List<SQLCreateModel> createList,
-			SQLCreate stmt) {
+			SQLCreate stmt, boolean strict) {
 		int index = 0;
 		for (SQLCreateModel create : createList) {
-			if (create.getTableName().toLowerCase().contains(
-					stmt.getTableName().toLowerCase())) {
-				return index;
+			if (strict) {
+				if (create.getTableName().toLowerCase().equals(
+						stmt.getTableName().toLowerCase())) {
+					return index;
+				}
+			} else {
+				if (create.getTableName().toLowerCase().contains(
+						stmt.getTableName().toLowerCase())) {
+					return index;
+				}
 			}
 			index++;
 		}
@@ -165,13 +176,19 @@ public class MatchingLogic {
 		// If otherwise, compare all SQL Statements
 		int maxMatchValue = matchValueOfCreate(currentMatchingResult
 				.getCreateStatements().get(0), xlinkStmt);
+		int matchIndex = -1;
+		if (maxMatchValue > 0) {
+			matchIndex = 0;
+		}
 		for (int i = 0; i < currentMatchingResult.getCreateStatements().size(); i++) {
 			int currentMatchValue = matchValueOfCreate(currentMatchingResult
 					.getCreateStatements().get(i), xlinkStmt);
 			if (currentMatchValue > maxMatchValue) {
 				maxMatchValue = currentMatchValue;
+				matchIndex = i;
 			}
 		}
+		currentMatchingResult.setIndexOfMatch(matchIndex);
 		return maxMatchValue;
 	}
 
@@ -185,7 +202,8 @@ public class MatchingLogic {
 			String fieldRepresentation = xlinkStmt.getFields()[i]
 					.getFieldName()
 					+ " " + xlinkStmt.getFields()[i].getFieldType();
-			if (create.getCreateBody().toLowerCase().contains(fieldRepresentation.toLowerCase())) {
+			if (create.getCreateBody().toLowerCase().contains(
+					fieldRepresentation.toLowerCase())) {
 				matchValue++;
 			}
 		}

@@ -48,6 +48,7 @@ public class SqlCreateViewer {
 	private static String openengsbUser;
 	private static String openengsbPassword;
 	private static String openengsbHostIp;
+	private static String clientLocale;
 
 	private static Logger logger = Logger.getLogger(SqlCreateViewer.class
 			.getName());
@@ -58,7 +59,8 @@ public class SqlCreateViewer {
 		PropertyConfigurator.configure(log4jFile);
 		readProperties();
 
-		SqlViewerGUI gui = new SqlViewerGUI(workingDirFile, openEngSBContext);
+		SqlViewerGUI gui = new SqlViewerGUI(workingDirFile, openEngSBContext,
+				clientLocale);
 		gui.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				shutdownApplication();
@@ -221,6 +223,11 @@ public class SqlCreateViewer {
 							.getProperty("openengsb.hostIp");
 				} else {
 					openengsbHostIp = "127.0.0.1";
+				}
+				if (registryEntries.getProperty("client.locale") != null) {
+					clientLocale = registryEntries.getProperty("client.locale");
+				} else {
+					clientLocale = "en";
 				}
 				in.close();
 			} else {

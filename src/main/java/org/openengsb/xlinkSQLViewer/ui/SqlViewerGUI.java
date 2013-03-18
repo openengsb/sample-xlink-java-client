@@ -50,7 +50,7 @@ import org.openengsb.xlinkSQLViewer.xlink.OpenEngSBConnectionManager;
 import org.openengsb.xlinkSQLViewer.xlink.matching.MatchingResult;
 
 /**
- * TODO TBW
+ * Simple GUI for this xlink sample client.
  */
 @SuppressWarnings("serial")
 public class SqlViewerGUI extends JFrame implements ClipboardOwner {
@@ -85,6 +85,7 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner {
 	/* Supplied program arguments */
 	private File workingDirectory;
 	private String openEngSBContext;
+	private String clientLocale;
 
 	/** List of currently opened Statements */
 	private List<SQLCreateModel> createStatements;
@@ -92,10 +93,12 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner {
 	/** Currently selected Statements */
 	private SQLCreateModel selectedStmt;
 
-	public SqlViewerGUI(File workingDirectory, String openEngSBContext) {
+	public SqlViewerGUI(File workingDirectory, String openEngSBContext,
+			String clientLocale) {
 		super();
 		this.openEngSBContext = openEngSBContext;
 		this.workingDirectory = workingDirectory;
+		this.clientLocale = clientLocale;
 		initItems();
 		buildWindow();
 	}
@@ -253,7 +256,8 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner {
 	}
 
 	/**
-	 * TODO TBW
+	 * Updates the LocalSwitch popup menu after a change in the list of local
+	 * installed software tools.
 	 */
 	public void updateLocalSwitchMenu() {
 		if (fetchTemplate().getRegisteredTools().length > 0) {
@@ -269,15 +273,15 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner {
 				XLinkConnectorView[] currentLocalToolViews = currentLocalTools[i]
 						.getAvailableViews();
 				for (int e = 0; e < currentLocalToolViews.length; e++) {
-					JMenuItem newMenuItemOfTool = new JMenuItem(new LocalSwitchAction(
-							currentLocalToolViews[e].getViewId(),
-							this,
-							currentLocalTools[i].getId(),
-							currentLocalToolViews[e].getViewId()));
+					JMenuItem newMenuItemOfTool = new JMenuItem(
+							new LocalSwitchAction(currentLocalToolViews[e]
+									.getViewId(), this, currentLocalTools[i]
+									.getId(), currentLocalToolViews[e]
+									.getViewId()));
 					String description = getDescriptionOfView(currentLocalToolViews[e]);
 					newMenuItemOfTool.setToolTipText(description);
 					newMenuItemOfTool.addActionListener(customActionHandler);
-					toolMenu.add(newMenuItemOfTool);				
+					toolMenu.add(newMenuItemOfTool);
 				}
 			}
 		} else {
@@ -287,11 +291,11 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner {
 	}
 
 	/**
-	 * TODO TBW
+	 * Returns the defined description of the programs language or, if not
+	 * found, an arbitary one.
 	 */
 	private String getDescriptionOfView(XLinkConnectorView view) {
-		// TODO note that locale "en" is assumed
-		String description = view.getDescriptions().get("en");
+		String description = view.getDescriptions().get(clientLocale);
 		if (description == null) {
 			for (String dummyValue : view.getDescriptions().values()) {
 				description = dummyValue;

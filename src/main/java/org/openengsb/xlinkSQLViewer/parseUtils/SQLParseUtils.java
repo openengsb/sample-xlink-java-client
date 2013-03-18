@@ -49,7 +49,7 @@ public final class SQLParseUtils {
 		String createName = "";
 		boolean startedCreate = false;
 
-		String createTableRegEx = " *create *table * ([a-zA-Z]+) *";
+		String createTableRegEx = " *CREATE *TABLE * ([a-zA-Z]+) *";
 		Pattern createTablePattern = Pattern.compile(createTableRegEx);
 		Matcher createTableMatcher;
 
@@ -60,7 +60,7 @@ public final class SQLParseUtils {
 		Pattern endCreatePattern = Pattern.compile(endCreateRegEx);
 
 		while ((inputLine = br.readLine()) != null) {
-			String inputString = inputLine.trim().toLowerCase();
+			String inputString = inputLine.trim();// .toLowerCase();
 
 			if ((createTableMatcher = createTablePattern.matcher(inputString))
 					.find()) {
@@ -138,7 +138,8 @@ public final class SQLParseUtils {
 	}
 
 	/**
-	 * TODO TBW
+	 * Triggers a local Switch request to the given SQL statemen, destined
+	 * connector and viewid.
 	 */
 	public static boolean triggerLocalSwitch(SQLCreateModel selectedStmt,
 			String openEngSBContext, String connectorId, String viewId)
@@ -167,7 +168,7 @@ public final class SQLParseUtils {
 		List<SQLCreateField> fields = new ArrayList<SQLCreateField>();
 		List<String> attributeStrings = Arrays.asList(createBody.split("\n"));
 
-		String attributeMatcher = "([a-zA-Z]+) ([a-zA-Z]+\\([0-9]+\\)|[a-zA-Z]+)[ ]*(.*)";
+		String attributeMatcher = "([a-zA-Z_]+) ([a-zA-Z]+\\([0-9]+\\)|[a-zA-Z]+)[ ]*(.*)";
 		Pattern pattern = Pattern.compile(attributeMatcher);
 
 		for (String attributeString : attributeStrings) {

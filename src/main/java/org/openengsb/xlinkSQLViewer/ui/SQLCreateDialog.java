@@ -57,7 +57,7 @@ public class SQLCreateDialog extends JDialog implements ActionListener,
 		tableAttrs = new JTextArea(15, 35);
 		tableAttrs.setText(createItem.getCreateBody());
 		tableAttrs.addKeyListener(this);
-		//tableAttrs.setEnabled(false);
+		// tableAttrs.setEnabled(false);
 		JScrollPane scp = new JScrollPane(tableAttrs);
 		contentPanel.add(scp, "span 2, wrap");
 

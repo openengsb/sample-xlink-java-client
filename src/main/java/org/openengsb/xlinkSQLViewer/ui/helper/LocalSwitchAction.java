@@ -10,9 +10,10 @@ import org.openengsb.xlinkSQLViewer.parseUtils.SQLParseUtils;
 import org.openengsb.xlinkSQLViewer.ui.SqlViewerGUI;
 
 /**
- * TODO TBW
- * 
+ * Class to define action of LocalSwitch Popup menu items. Triggers a local
+ * switch with the data of the selected item.
  */
+@SuppressWarnings("serial")
 public class LocalSwitchAction extends AbstractAction {
 
 	private SqlViewerGUI gui;
