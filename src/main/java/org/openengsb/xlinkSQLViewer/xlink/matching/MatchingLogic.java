@@ -96,10 +96,10 @@ public class MatchingLogic {
 							.parseCreateStatementsFromFile(file);
 					int indexInFile = findIndexOfCreateStmt(createStmts,
 							xlinkStmt, true);
-					if (indexInFile == -1) {
+					/*if (indexInFile == -1) {
 						indexInFile = findIndexOfCreateStmt(createStmts,
 								xlinkStmt, false);
-					}
+					}*/
 					if (indexInFile != -1) {
 						matches.add(new MatchingResult(file, createStmts,
 								indexInFile));
@@ -198,6 +198,9 @@ public class MatchingLogic {
 	 */
 	private int matchValueOfCreate(SQLCreateModel create, SQLCreate xlinkStmt) {
 		int matchValue = 0;
+		if(create.getTableName().contains(xlinkStmt.getTableName())){
+			matchValue++;
+		}
 		for (int i = 0; i < xlinkStmt.getFields().length; i++) {
 			String fieldRepresentation = xlinkStmt.getFields()[i]
 					.getFieldName()
