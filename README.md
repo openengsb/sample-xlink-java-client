@@ -41,7 +41,7 @@ CREATE TABLE 'TABLENAME'
 );
 
 Make sure that the opening and closing bracket have no leading or trailing spaces.
-Every fieldDefintion must be written in it´s own row.
+Every fieldDefintion must be written in it's own row.
 
 Accepted Constraints are
  PRIMARY KEY
@@ -58,8 +58,6 @@ Implemented Functionality
 - Incoming potential Matches are searched in the WorkingDirectory and, if found, the most likely match is displayed.
 - Incoming updates about other local tools that support XLink are processed. 
 
-Not yet Implemented Functionality
+Not implemented Functionality
 ==========================
-- onRegisteredToolsChanged has not been tested yet (see Issue OPENENGSB-3268)
-- 'Local Switch' functionality
 - Creation of Statements
