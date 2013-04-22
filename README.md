@@ -41,7 +41,7 @@ CREATE TABLE 'TABLENAME'
 );
 
 Make sure that the opening and closing bracket have no leading or trailing spaces.
-Every fieldDefintion must be written in it�s own row.
+Every fieldDefintion must be written in it's own row.
 
 Accepted Constraints are
  PRIMARY KEY
