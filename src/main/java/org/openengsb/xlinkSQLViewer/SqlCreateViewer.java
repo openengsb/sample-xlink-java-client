@@ -225,8 +225,6 @@ public class SqlCreateViewer {
                     clientLocale = "en";
                 }
                 in.close();
-            } else {
-                throw new IOException();
             }
         } catch (IOException ex) {
             writeErrorAndExit("The properties file '" + propertiesFile

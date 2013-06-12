@@ -1,10 +1,6 @@
 package org.openengsb.xlinkSQLViewer.xlink;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.openengsb.core.api.AliveState;
 import org.openengsb.core.api.Connector;
 import org.openengsb.core.api.model.ModelDescription;
@@ -12,6 +8,7 @@ import org.openengsb.core.api.xlink.model.XLinkConnector;
 import org.openengsb.core.api.xlink.model.XLinkUrlBlueprint;
 import org.openengsb.domain.SQLCode.SQLCodeDomain;
 import org.openengsb.domain.SQLCode.model.SQLCreate;
+import org.openengsb.loom.java.util.JsonUtils;
 import org.openengsb.xlinkSQLViewer.ui.SqlViewerGUI;
 import org.openengsb.xlinkSQLViewer.xlink.matching.MatchingLogic;
 import org.openengsb.xlinkSQLViewer.xlink.matching.MatchingResult;
@@ -80,8 +77,7 @@ public class LinkableConnector implements SQLCodeDomain, Connector {
                 if (modelInformation.getModelClassName().equals(
                         SQLCreate.class.getName())) {
                     for (Object match : potentialMatch) {
-                        SQLCreate currentMatch = convertToCreate(match
-                                .toString());
+                        SQLCreate currentMatch = convertToCreate(match);
                         if (currentMatch != null) {
                             MatchingResult foundMatch = matchLogic
                                     .findMostPotentialLocalMatch(currentMatch);
@@ -106,69 +102,17 @@ public class LinkableConnector implements SQLCodeDomain, Connector {
     }
 
     /**
-     * Converts the received match to the local used SQLCreate object. Returns null, if the conversion fails TODO
-     * [OPENENGSB-3270] remove hack
+     * Converts the received match to the local used SQLCreate object. Returns null, if the conversion fails 
      */
-    private SQLCreate convertToCreate(String object) {
-        object = convertJSONStringHack(object);
-        ObjectMapper mapper = new ObjectMapper();
-        SQLCreate result;
+    private SQLCreate convertToCreate(Object object) {
+        SQLCreate result = null;
         try {
-            result = mapper.readValue(object, SQLCreate.class);
-            return result;
+             result = JsonUtils.convertArgument(object, SQLCreate.class);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
         }
-        return null;
-    }
-
-    /**
-     * TODO [OPENENGSB-3270] parse the incoming string into the correct format, as long as the loom-java bridge dosen't
-     * resolve the objects correctly
-     */
-    private String convertJSONStringHack(String jsonString) {
-        // remove tail
-        String replaced = jsonString.replaceAll(", openEngSBModelTail=\\[\\]",
-                "");
-        // replace normal key/value with =
-        replaced = replaced.replaceAll(
-                "[ ]?(\\w+\\([0-9]+\\)|\\w+)=(\\w+\\([0-9]+\\)|\\w+)",
-                "\"$1\":\"$2\"");
-        // replace head of list
-        replaced = replaced.replaceAll(" (\\w+\\([0-9]+\\)|\\w+)=\\[",
-                "\"$1\":\\[");
-
-        // replaced blank between complex elements
-        replaced = replaced.replaceAll("\\}, \\{", "\\},\\{");
-
-        // replace list
-        String listPatternString =
-            "\\[[\\w |REFERENCES [a-zA-Z]+\\([a-zA-Z]+\\)][, \\w |REFERENCES [a-zA-Z]+\\([a-zA-Z]+\\)]*\\]";
-        Pattern listPattern = Pattern.compile(listPatternString);
-        Matcher foreingKeyMatcher = listPattern.matcher(replaced);
-
-        while (foreingKeyMatcher.find()) {
-            String foundList = foreingKeyMatcher.group(0);
-            // singleList Replace
-            String replacedList = foundList.replaceAll(
-                    "\\[([\\w |REFERENCES [a-zA-Z]+\\([a-zA-Z]+\\)]+)\\]",
-                    "\\[\"$1\"\\]");
-            // startList Replace
-            replacedList = replacedList.replaceAll(
-                    "\\[([\\w |REFERENCES [a-zA-Z]+\\([a-zA-Z]+\\)]+), ",
-                    "\\[\"$1\",");
-            // middleList Replace
-            replacedList = replacedList.replaceAll(
-                    ",[ ]?([\\w |REFERENCES [a-zA-Z]+\\([a-zA-Z]+\\)]+)[ ]?,",
-                    ",\"$1\",");
-            // endList Replace
-            replacedList = replacedList.replaceAll(
-                    ",[ ]?([\\w |REFERENCES [a-zA-Z]+\\([a-zA-Z]+\\)]+)\\]",
-                    ",\"$1\"\\]");
-            replaced = replaced.replace(foundList, replacedList);
-        }
-        return replaced;
+        return result;
     }
 
     @Override
