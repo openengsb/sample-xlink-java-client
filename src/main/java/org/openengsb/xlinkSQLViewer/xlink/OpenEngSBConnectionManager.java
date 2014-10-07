@@ -1,21 +1,19 @@
 package org.openengsb.xlinkSQLViewer.xlink;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.jms.JMSException;
 
 import org.apache.log4j.Logger;
 import org.openengsb.connector.usernamepassword.Password;
-import org.openengsb.core.api.ConnectorManager;
 import org.openengsb.core.api.ConnectorValidationFailedException;
 import org.openengsb.core.api.model.ModelDescription;
 import org.openengsb.core.api.xlink.exceptions.DomainNotLinkableException;
-import org.openengsb.core.api.xlink.model.ModelToViewsTuple;
+import org.openengsb.core.api.xlink.model.ModelViewMapping;
 import org.openengsb.core.api.xlink.model.XLinkConnectorView;
-import org.openengsb.core.api.xlink.model.XLinkUrlBlueprint;
+import org.openengsb.core.api.xlink.service.XLinkConnectorManager;
 import org.openengsb.domain.SQLCode.SQLCodeDomainEvents;
 import org.openengsb.domain.SQLCode.model.SQLCreate;
 import org.openengsb.loom.java.ProxyConnectorFactory;
@@ -27,20 +25,19 @@ import org.openengsb.xlinkSQLViewer.ui.SqlViewerGUI;
  */
 public class OpenEngSBConnectionManager {
 
-    private static Logger logger = Logger
-            .getLogger(OpenEngSBConnectionManager.class.getName());
+    private static Logger logger = Logger.getLogger(OpenEngSBConnectionManager.class.getName());
 
     /* XLink variables */
     private ProxyConnectorFactory domainFactory;
     private JmsProtocolHandler jmsConfig;
-    private ConnectorManager cm;
+    private XLinkConnectorManager xcm;
 
     /* Supplied program arguments */
-    private String xlinkServerURL;
-    private String domainId;
-    private String programname;
-    private String openengsbUser;
-    private String openengsbPassword;
+    private final String xlinkServerURL;
+    private final String domainId;
+    private final String programname;
+    private final String openengsbUser;
+    private final String openengsbPassword;
 
     /** Id of the registered OpenEngSB-Connector */
     private String connectorUUID;
@@ -51,10 +48,7 @@ public class OpenEngSBConnectionManager {
     /**
      * HostIP of the local system, used to identify the Host during an XLink call
      */
-    private String hostIp;
-
-    /** XLinkUrlBlueprint received during XLinkRegistration */
-    private XLinkUrlBlueprint blueprint;
+    private final String hostIp;
 
     /** Proxy EventInterface to send events to the OpenEngSB */
     private SQLCodeDomainEvents domainEvents;
@@ -106,20 +100,17 @@ public class OpenEngSBConnectionManager {
         /* Create/Register the connector */
         jmsConfig = new JmsProtocolHandler(xlinkServerURL,
                 "sample-xlink-java-client");
-        domainFactory = new ProxyConnectorFactory(jmsConfig, openengsbUser,
-                new Password(openengsbPassword));
+        domainFactory = new ProxyConnectorFactory(jmsConfig, openengsbUser, new Password(openengsbPassword));
         connectorUUID = domainFactory.createConnector(domainId);
-        LinkableConnector handler = new LinkableConnector(gui);
+        LinkableConnector handler = new LinkableConnector(gui, domainFactory);
         domainFactory.registerConnector(connectorUUID, handler);
 
         /* Fetch Event Interface */
-        domainEvents = domainFactory.getRemoteProxy(SQLCodeDomainEvents.class,
-                null);
+        domainEvents = domainFactory.getRemoteProxy(SQLCodeDomainEvents.class);
 
         /* Register to XLink */
-        cm = domainFactory.getRemoteProxy(ConnectorManager.class, null);
-        blueprint = cm.connectToXLink(connectorUUID, hostIp, programname,
-                initModelViewRelation());
+        xcm = domainFactory.getRemoteProxy(XLinkConnectorManager.class);
+        xcm.registerWithXLink(connectorUUID, hostIp, "SQLViewer", initModelViewMapping());
 
         connected = true;
         gui.changeStatusToConnected();
@@ -129,26 +120,21 @@ public class OpenEngSBConnectionManager {
     /**
      * Creates the Array of Model/View relations, offered by the Tool, for XLink
      */
-    private ModelToViewsTuple[] initModelViewRelation() {
-        ModelToViewsTuple[] modelsToViews = new ModelToViewsTuple[1];
-        Map<String, String> descriptions = new HashMap<String, String>();
-        descriptions.put("en", "This view opens the values in a SQLViewer.");
-        descriptions.put("de",
-                "Dieses Tool oeffnet die Werte in einem SQLViewer.");
-        List<XLinkConnectorView> views = new ArrayList<XLinkConnectorView>();
-        views.add(new XLinkConnectorView(SqlViewerGUI.viewId,
-                SqlViewerGUI.viewName, descriptions));
-        modelsToViews[0] = new ModelToViewsTuple(new ModelDescription(
-                SQLCreate.class.getName(), "3.0.0.SNAPSHOT"), views
-                .toArray(new XLinkConnectorView[0]));
-        return modelsToViews;
-    }
+    private ModelViewMapping[] initModelViewMapping() {
+        ModelViewMapping[] modelsViews = new ModelViewMapping[1];
 
-    /*
-     * private String getHostName(){ String hostname = null; try { InetAddress addr = InetAddress.getLocalHost();
-     * hostname = addr.getHostName(); logger.log(Level.INFO,"Host "+hostname); } catch (UnknownHostException e) { }
-     * return hostname; }
-     */
+        Map<Locale, String> descriptions = new HashMap<Locale, String>();
+        descriptions.put(new Locale("en"), "This view opens the values in a SQLViewer.");
+        descriptions.put(new Locale("de"), "Dieses Tool oeffnet die Werte in einem SQLViewer.");
+
+        XLinkConnectorView[] views = new XLinkConnectorView[1];
+        views[0] = new XLinkConnectorView(SqlViewerGUI.viewId, SqlViewerGUI.viewName, descriptions);
+
+        modelsViews[0] =
+ new ModelViewMapping(new ModelDescription(SQLCreate.class.getName(), "3.0.0.M2"), views);
+
+        return modelsViews;
+    }
 
     public boolean isConnected() {
         return connected;
@@ -165,15 +151,18 @@ public class OpenEngSBConnectionManager {
      * Unregisters the connector from XLink and removes it from the OpenEngSB
      */
     public void disconnect() {
-        cm.disconnectFromXLink(connectorUUID, hostIp);
+        xcm.unregisterFromXLink(connectorUUID);
         domainFactory.unregisterConnector(connectorUUID);
         domainFactory.deleteConnector(connectorUUID);
         jmsConfig.destroy();
         logger.info("disconnected from openEngSB and XLink");
     }
 
-    public XLinkUrlBlueprint getBluePrint() {
-        return blueprint;
+    public XLinkConnectorManager getXcm() {
+        return xcm;
     }
 
+    public String getConnectorId() {
+        return connectorUUID;
+    }
 }

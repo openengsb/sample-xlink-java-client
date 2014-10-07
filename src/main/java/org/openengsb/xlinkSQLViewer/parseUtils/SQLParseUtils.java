@@ -16,15 +16,12 @@ import java.util.regex.Pattern;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.openengsb.core.api.model.ModelDescription;
-import org.openengsb.core.api.xlink.model.XLinkUrlBlueprint;
+import org.openengsb.core.api.xlink.service.XLinkConnectorManager;
 import org.openengsb.domain.SQLCode.model.SQLCreate;
 import org.openengsb.domain.SQLCode.model.SQLCreateField;
 import org.openengsb.xlinkSQLViewer.exceptions.GenerateXLinkException;
 import org.openengsb.xlinkSQLViewer.exceptions.SQLFileNotWellFormedException;
 import org.openengsb.xlinkSQLViewer.model.SQLCreateModel;
-import org.openengsb.xlinkSQLViewer.ui.SqlViewerGUI;
 import org.openengsb.xlinkSQLViewer.xlink.OpenEngSBConnectionManager;
 
 /**
@@ -105,35 +102,17 @@ public final class SQLParseUtils {
     public static String genereateXLink(SQLCreateModel selectedStmt,
             String openEngSBContext) throws JsonGenerationException,
             JsonMappingException, IOException, GenerateXLinkException {
-        ModelDescription modelInformation = fetchTemplate().getViewToModels()
-                .get(SqlViewerGUI.viewId);
-        String definedClass = modelInformation.getModelClassName();
-        /* Note that only the target class SQLCreate is allowed */
-        if (!definedClass.equals(SQLCreate.class.getName())) {
-            throw new GenerateXLinkException("XLinkError - Targetmodel '"
-                    + SQLCreate.class.getName() + "' not supported");
-        }
-        String completeUrl = fetchTemplate().getBaseUrl();
-        completeUrl += "&"
-                + fetchTemplate().getKeyNames().getModelClassKeyName() + "="
-                + urlEncodeParameter(modelInformation.getModelClassName());
-        completeUrl += "&"
-                + fetchTemplate().getKeyNames().getModelVersionKeyName() + "="
-                + urlEncodeParameter(modelInformation.getVersionString());
-        completeUrl += "&"
-                + fetchTemplate().getKeyNames().getContextIdKeyName() + "="
-                + urlEncodeParameter(openEngSBContext);
+        XLinkConnectorManager connectorManager = fetchXLinkConnectorManager();
 
         SQLCreate emtpyCreate = new SQLCreate();
         emtpyCreate.setTableName(selectedStmt.getTableName());
         emtpyCreate.setFields(parseFieldsOutOfCreateBody(selectedStmt
                 .getCreateBody()));
 
-        ObjectMapper mapper = new ObjectMapper();
-        String objectString = mapper.writeValueAsString(emtpyCreate);
-        completeUrl += "&"
-                + fetchTemplate().getKeyNames().getIdentifierKeyName() + "="
-                + urlEncodeParameter(objectString);
+        String completeUrl =
+            connectorManager.generateXLink(OpenEngSBConnectionManager.getInstance().getConnectorId(),
+                    openEngSBContext, emtpyCreate);
+
         return completeUrl;
     }
 
@@ -145,11 +124,6 @@ public final class SQLParseUtils {
             throws JsonGenerationException, JsonMappingException, IOException,
             GenerateXLinkException {
         String xlink = genereateXLink(selectedStmt, openEngSBContext);
-        // TODO remove Hack (hardcoded ConnectorIdKeyname) after correct
-        // implementation at OpenEngSB
-        xlink += "&" + "connectorId=" + connectorId + "&"
-                + fetchTemplate().getKeyNames().getViewIdKeyName() + "="
-                + urlEncodeParameter(viewId);
         URL url = new URL(xlink);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
@@ -213,11 +187,8 @@ public final class SQLParseUtils {
         return parameter;
     }
 
-    /**
-     * Fetches the XLinkUrlBlueprint from the ConnectorManager
-     */
-    private static XLinkUrlBlueprint fetchTemplate() {
-        return OpenEngSBConnectionManager.getInstance().getBluePrint();
+    private static XLinkConnectorManager fetchXLinkConnectorManager() {
+        return OpenEngSBConnectionManager.getInstance().getXcm();
     }
 
 }
