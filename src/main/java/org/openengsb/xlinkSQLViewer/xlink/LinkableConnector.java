@@ -3,11 +3,13 @@ package org.openengsb.xlinkSQLViewer.xlink;
 import org.apache.log4j.Logger;
 import org.openengsb.core.api.AliveState;
 import org.openengsb.core.api.Connector;
+import org.openengsb.core.api.LinkingSupport;
 import org.openengsb.core.api.model.ModelDescription;
-import org.openengsb.core.api.xlink.model.XLinkConnector;
-import org.openengsb.core.api.xlink.model.XLinkUrlBlueprint;
+import org.openengsb.core.api.xlink.model.XLinkConnectorView;
+import org.openengsb.core.api.xlink.model.XLinkObject;
 import org.openengsb.domain.SQLCode.SQLCodeDomain;
 import org.openengsb.domain.SQLCode.model.SQLCreate;
+import org.openengsb.loom.java.ProxyConnectorFactory;
 import org.openengsb.loom.java.util.JsonUtils;
 import org.openengsb.xlinkSQLViewer.ui.SqlViewerGUI;
 import org.openengsb.xlinkSQLViewer.xlink.matching.MatchingLogic;
@@ -17,23 +19,24 @@ import org.openengsb.xlinkSQLViewer.xlink.matching.MatchingResult;
  * Connector implementation of the ExampleDomain 'SQLCode'
  */
 public class LinkableConnector implements SQLCodeDomain, Connector {
-
-    private static Logger logger = Logger.getLogger(LinkableConnector.class
-            .getName());
+    private static Logger logger = Logger.getLogger(LinkableConnector.class.getName());
 
     /** Reference to the GUI */
-    private SqlViewerGUI gui;
+    private final SqlViewerGUI gui;
 
     /** Class to process potential Matches */
-    private MatchingLogic matchLogic;
+    private final MatchingLogic matchLogic;
+
+    private final ProxyConnectorFactory connectorFactory;
 
     private String domainId;
     private String connectorId;
 
-    public LinkableConnector(SqlViewerGUI gui) {
+    public LinkableConnector(SqlViewerGUI gui, ProxyConnectorFactory connectorFactory) {
         super();
         this.gui = gui;
         this.matchLogic = new MatchingLogic(gui.getWorkingDirectory());
+        this.connectorFactory = connectorFactory;
     }
 
     /**
@@ -45,58 +48,32 @@ public class LinkableConnector implements SQLCodeDomain, Connector {
         gui.addData(model);
     }
 
-    /**
-     * Updates the Registered ToolList
-     */
     @Override
-    public void onRegisteredToolsChanged(XLinkConnector[] changedConnectors) {
-        logger
-                .debug("'onRegisteredToolsUpdateEvent' was triggered from the OpenEngSB");
-        fetchTemplate().setRegisteredTools(changedConnectors);
-        gui.updateLocalSwitchMenu();
-    }
-
-    /**
-     * Processes incomming, potential matches.<br/>
-     * Local matches are searched and displayed.
-     */
-    @Override
-    public void openXLinks(final Object[] potentialMatch, final String viewId) {
+    public void showXLinks(final XLinkObject[] arg0) {
         new Thread(new Runnable() {
+            @Override
             public void run() {
-                if (!SqlViewerGUI.viewId.equals(viewId)) {
-                    logger
-                            .warn("An XLink matching was triggerd with an unknown viewId.");
-                    gui
-                            .showXLinkMissMatch("An XLink matching was triggerd with an unknown viewId.");
-                    return;
-                }
-                ModelDescription modelInformation = fetchTemplate()
-                        .getViewToModels().get(viewId);
-                /* The Model 'SQLCreate' is the only accepted Model here */
-                if (modelInformation.getModelClassName().equals(
-                        SQLCreate.class.getName())) {
-                    for (Object match : potentialMatch) {
-                        SQLCreate currentMatch = convertToCreate(match);
-                        if (currentMatch != null) {
-                            MatchingResult foundMatch = matchLogic
-                                    .findMostPotentialLocalMatch(currentMatch);
-                            if (foundMatch != null) {
-                                gui.openXLinkMatch(foundMatch);
-                                return;
-                            }
+                for (XLinkObject obj : arg0) {
+                    LinkingSupport service =
+                        connectorFactory.getRemoteProxy(LinkingSupport.class, obj.getConnectorId());
+                    // service.openXLink(obj.getModelDescription(), obj, obj.getViews());
+                    if (!obj.getModelDescription().getModelClassName().equals(SQLCreate.class.getName())) {
+                        logger.warn("An XLink matching was triggered, but the defined model is not supported");
+                        gui.showXLinkMissMatch("An XLink matching was triggered, but the defined model is not supported");
+                        continue;
+                    }
+                    SQLCreate currentMatch = convertToCreate(obj.getModelObject());
+                    if (currentMatch != null) {
+                        MatchingResult foundMatch = matchLogic.findMostPotentialLocalMatch(currentMatch);
+                        if (foundMatch != null) {
+                            gui.openXLinkMatch(foundMatch);
+                            return;
                         }
                     }
-                } else {
-                    logger
-                            .warn("An XLink matching was triggered, but the defined model is not supported");
-                    gui
-                            .showXLinkMissMatch("An XLink matching was triggered, but the defined model is not supported");
+
                 }
-                logger
-                        .warn("An XLink matching was triggered, but no match was found.");
-                gui
-                        .showXLinkMissMatch("An XLink matching was triggered, but no match was found.");
+                logger.warn("An XLink matching was triggered, but no match was found.");
+                gui.showXLinkMissMatch("An XLink matching was triggered, but no match was found.");
             }
         }).start();
     }
@@ -113,6 +90,32 @@ public class LinkableConnector implements SQLCodeDomain, Connector {
             e.printStackTrace();
         }
         return result;
+    }
+
+    @Override
+    public void openXLink(final ModelDescription arg0, final Object arg1, XLinkConnectorView arg2) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (!arg0.getModelClassName().equals(SQLCreate.class.getName())) {
+                    logger.warn("An XLink matching was triggered, but the defined model is not supported");
+                    gui.showXLinkMissMatch("An XLink matching was triggered, but the defined model is not supported");
+                } else {
+                    SQLCreate currentMatch = convertToCreate(arg1);
+                    if (currentMatch != null) {
+                        MatchingResult foundMatch = matchLogic.findMostPotentialLocalMatch(currentMatch);
+                        if (foundMatch != null) {
+                            gui.openXLinkMatch(foundMatch);
+                            return;
+                        }
+                    } else {
+                        logger.warn("An XLink matching was triggered, but no match was found.");
+                        gui.showXLinkMissMatch("An XLink matching was triggered, but no match was found.");
+                    }
+                }
+            }
+        }).start();
+
     }
 
     @Override
@@ -143,13 +146,6 @@ public class LinkableConnector implements SQLCodeDomain, Connector {
     @Override
     public void setDomainId(String domainId) {
         this.domainId = domainId;
-    }
-
-    /**
-     * Fetches the XLinkTemple from the ConnectorManager
-     */
-    private XLinkUrlBlueprint fetchTemplate() {
-        return OpenEngSBConnectionManager.getInstance().getBluePrint();
     }
 
 }

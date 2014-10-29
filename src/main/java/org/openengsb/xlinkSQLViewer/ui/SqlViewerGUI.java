@@ -35,18 +35,14 @@ import javax.swing.filechooser.FileSystemView;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.openengsb.core.api.xlink.model.XLinkConnector;
 import org.openengsb.core.api.xlink.model.XLinkConnectorView;
-import org.openengsb.core.api.xlink.model.XLinkUrlBlueprint;
 import org.openengsb.domain.SQLCode.model.SQLCreate;
 import org.openengsb.xlinkSQLViewer.SqlCreateViewer;
 import org.openengsb.xlinkSQLViewer.exceptions.SQLFileNotWellFormedException;
 import org.openengsb.xlinkSQLViewer.model.SQLCreateModel;
 import org.openengsb.xlinkSQLViewer.parseUtils.SQLParseUtils;
-import org.openengsb.xlinkSQLViewer.ui.helper.LocalSwitchAction;
 import org.openengsb.xlinkSQLViewer.ui.helper.SingleRootFileSystemView;
 import org.openengsb.xlinkSQLViewer.ui.helper.SqlFileFilter;
-import org.openengsb.xlinkSQLViewer.xlink.OpenEngSBConnectionManager;
 import org.openengsb.xlinkSQLViewer.xlink.matching.MatchingResult;
 
 /**
@@ -82,9 +78,9 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner {
     private CustomActionHandler customActionHandler;
 
     /* Supplied program arguments */
-    private File workingDirectory;
-    private String openEngSBContext;
-    private String clientLocale;
+    private final File workingDirectory;
+    private final String openEngSBContext;
+    private final String clientLocale;
 
     /** List of currently opened Statements */
     private List<SQLCreateModel> createStatements;
@@ -248,43 +244,13 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner {
     public void changeStatusToConnected() {
         extractXLink.setText("Extract XLink");
         extractXLink.setEnabled(true);
-        if (fetchTemplate().getRegisteredTools().length > 0) {
-            updateLocalSwitchMenu();
-        }
     }
 
     /**
      * Updates the LocalSwitch popup menu after a change in the list of local installed software tools.
      */
     public void updateLocalSwitchMenu() {
-        if (fetchTemplate().getRegisteredTools().length > 0) {
-            triggerLocalSwitchMenu.setText("Local Switching");
-            triggerLocalSwitchMenu.setEnabled(true);
-            triggerLocalSwitchMenu.removeAll();
-
-            XLinkConnector[] currentLocalTools = fetchTemplate()
-                    .getRegisteredTools();
-            for (int i = 0; i < currentLocalTools.length; i++) {
-                JMenu toolMenu = new JMenu(currentLocalTools[i].getToolName());
-                triggerLocalSwitchMenu.add(toolMenu);
-                XLinkConnectorView[] currentLocalToolViews = currentLocalTools[i]
-                        .getAvailableViews();
-                for (int e = 0; e < currentLocalToolViews.length; e++) {
-                    JMenuItem newMenuItemOfTool = new JMenuItem(
-                            new LocalSwitchAction(currentLocalToolViews[e]
-                                    .getViewId(), this, currentLocalTools[i]
-                                    .getId(), currentLocalToolViews[e]
-                                    .getViewId()));
-                    String description = getDescriptionOfView(currentLocalToolViews[e]);
-                    newMenuItemOfTool.setToolTipText(description);
-                    newMenuItemOfTool.addActionListener(customActionHandler);
-                    toolMenu.add(newMenuItemOfTool);
-                }
-            }
-        } else {
-            triggerLocalSwitchMenu.setText("LocalSwitch not available");
-            triggerLocalSwitchMenu.setEnabled(false);
-        }
+        logger.error("Not supported");
     }
 
     /**
@@ -331,10 +297,12 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner {
      * Statement's Details
      */
     private class SqlListMouseListener extends MouseAdapter {
+        @Override
         public void mousePressed(MouseEvent e) {
             maybeShowPopup(e);
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
             maybeShowPopup(e);
         }
@@ -352,6 +320,7 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner {
             }
         }
 
+        @Override
         public void mouseClicked(MouseEvent e) {
             if (e.getClickCount() == 2) {
                 int index = sqlList.locationToIndex(e.getPoint());
@@ -404,7 +373,7 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner {
                             Clipboard clipboard = Toolkit.getDefaultToolkit()
                                     .getSystemClipboard();
                             clipboard.setContents(stringSelection,
-                                    (ClipboardOwner) SqlViewerGUI.this);
+                                    SqlViewerGUI.this);
                         } catch (Exception ex) {
                             handleErrorVisualy("Error during XLink creation.",
                                     ex);
@@ -430,10 +399,4 @@ public class SqlViewerGUI extends JFrame implements ClipboardOwner {
         return selectedStmt;
     }
 
-    /**
-     * Fetches the XLinkUrlBlueprint from the ConnectorManager
-     */
-    private static XLinkUrlBlueprint fetchTemplate() {
-        return OpenEngSBConnectionManager.getInstance().getBluePrint();
-    }
 }
