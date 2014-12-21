@@ -5,6 +5,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Properties;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -49,6 +50,7 @@ public class SqlCreateViewer {
     private static String openengsbPassword;
     private static String openengsbHostIp;
     private static String clientLocale;
+    private static String sqlCodeDomainVersion;
 
     private static Logger logger = Logger.getLogger(SqlCreateViewer.class.getName());
 
@@ -65,13 +67,12 @@ public class SqlCreateViewer {
             }
         });
 
-        OpenEngSBConnectionManager.initInstance(xlinkServerURL, domainId, programname, openengsbUser, openengsbPassword, openengsbHostIp);
+        OpenEngSBConnectionManager.initInstance(xlinkServerURL, domainId, programname, openengsbUser,
+                openengsbPassword, openengsbHostIp, sqlCodeDomainVersion);
         try {
-            OpenEngSBConnectionManager.getInstance()
-                    .connectToOpenEngSbWithXLink(gui);
+            OpenEngSBConnectionManager.getInstance().connectToOpenEngSbWithXLink(gui);
         } catch (Exception e) {
-            gui.handleErrorVisualy(
-                    "Could not establish connection to OpenEngSB.", e);
+            gui.handleErrorVisualy("Could not establish connection to OpenEngSB.", e);
         }
     }
 
@@ -85,8 +86,7 @@ public class SqlCreateViewer {
         File log4jF_dev = new File(log4jFile_dev);
         if (!propF.exists()) {
             if (!propF_dev.exists()) {
-                logger.error("PropertiesFile '" + propertiesFile
-                        + "' was not found.");
+                logger.error("PropertiesFile '" + propertiesFile + "' was not found.");
                 shutdownApplication(EXIT_FAILURE);
             } else {
                 propertiesFile = propertiesFile_dev;
@@ -94,9 +94,7 @@ public class SqlCreateViewer {
         }
         if (!log4jF.exists()) {
             if (!log4jF_dev.exists()) {
-                logger
-                        .error("LogConfigFile '" + log4jFile
-                                + "' was not found.");
+                logger.error("LogConfigFile '" + log4jFile + "' was not found.");
                 shutdownApplication(EXIT_FAILURE);
             } else {
                 log4jFile = log4jFile_dev;
@@ -157,91 +155,103 @@ public class SqlCreateViewer {
      * Reads the properties file
      */
     private static void readProperties() {
-        java.io.InputStream in = null;
-        try {
-            in = new FileInputStream(propertiesFile);
+        try (java.io.InputStream in = new FileInputStream(propertiesFile)) {
             if (in != null) {
-                java.util.Properties registryEntries = new java.util.Properties();
-                registryEntries.load(in);
-                if (registryEntries.getProperty("working.dir") != null) {
-                    String workingDir = registryEntries
-                            .getProperty("working.dir");
-                    workingDirFile = new File(workingDir);
-                    if (!workingDirFile.isDirectory()) {
-                        throw new Exception("Defined WorkingDirectory \""
-                                + workingDir + "\" does not exist.");
-                    }
-                } else {
-                    throw new Exception(
-                            "WorkingDirectory (parameter 'working.dir') must be set.");
-                }
-                if (registryEntries.getProperty("xlink.xlinkServerURL") != null) {
-                    xlinkServerURL = registryEntries
-                            .getProperty("xlink.xlinkServerURL");
-                } else {
-                    throw new Exception(
-                            "XLinkUrl (parameter 'xlink.xlinkServerURL') must be set.");
-                }
+                java.util.Properties properties = new java.util.Properties();
+                properties.load(in);
 
-                if (registryEntries.getProperty("openengsb.context") != null) {
-                    openEngSBContext = registryEntries
-                            .getProperty("openengsb.context");
-                } else {
-                    throw new Exception(
-                            "OpenEngSb Context (parameter 'openengsb.context') must be set.");
-                }
-
-                if (registryEntries
-                        .getProperty("openengsb.connection.domainId") != null) {
-                    domainId = registryEntries
-                            .getProperty("openengsb.connection.domainId");
-                } else {
-                    throw new Exception(
-                            "OpenEngSb DomainId (parameter 'openengsb.connection.domainId') must be set.");
-                }
-                if (registryEntries.getProperty("openengsb.user") != null) {
-                    openengsbUser = registryEntries
-                            .getProperty("openengsb.user");
-                } else {
-                    throw new Exception(
-                            "OpenEngSb User (parameter 'openengsb.user') must be set.");
-                }
-                if (registryEntries.getProperty("openengsb.password") != null) {
-                    openengsbPassword = registryEntries
-                            .getProperty("openengsb.password");
-                } else {
-                    throw new Exception(
-                            "OpenEngSb Password (parameter 'openengsb.password') must be set.");
-                }
-                if (registryEntries.getProperty("openengsb.hostIp") != null) {
-                    openengsbHostIp = registryEntries
-                            .getProperty("openengsb.hostIp");
-                } else {
-                    openengsbHostIp = "127.0.0.1";
-                }
-                if (registryEntries.getProperty("client.locale") != null) {
-                    clientLocale = registryEntries.getProperty("client.locale");
-                } else {
-                    clientLocale = "en";
-                }
-                in.close();
+                initWorkingDirectory(properties);
+                initXlinkServerURL(properties);
+                initOpenEngSBContext(properties);
+                initDomainId(properties);
+                initOpenEngSBUser(properties);
+                initOpenEngSBPassword(properties);
+                initOpenEngSBHostIp(properties);
+                initClientLocale(properties);
+                initSqlCodeDomainVersion(properties);
             }
         } catch (IOException ex) {
-            writeErrorAndExit("The properties file '" + propertiesFile
-                    + "' was not found.\n", ex);
+            writeErrorAndExit("The properties file '" + propertiesFile + "' was not found.\n", ex);
         } catch (NumberFormatException e) {
-            writeErrorAndExit(
-                    "One of the values of the properties file, doesn't have the correct format.\n",
-                    e);
+            writeErrorAndExit("One of the values of the properties file, doesn't have the correct format.\n", e);
         } catch (Exception e3) {
             writeErrorAndExit("An exception occured during startup.\n", e3);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                }
+        }
+    }
+
+    private static void initSqlCodeDomainVersion(Properties properties) throws Exception {
+        if (properties.getProperty("sqlcode.version") != null) {
+            sqlCodeDomainVersion = properties.getProperty("sqlcode.version");
+        } else {
+            throw new Exception("SQLCode domain version (parameter 'sqlcode.version') must be set.");
+        }
+    }
+
+    private static void initClientLocale(Properties properties) {
+        if (properties.getProperty("client.locale") != null) {
+            clientLocale = properties.getProperty("client.locale");
+        } else {
+            clientLocale = "en";
+        }
+    }
+
+    private static void initOpenEngSBHostIp(Properties properties) throws Exception {
+        if (properties.getProperty("openengsb.hostIp") != null) {
+            openengsbHostIp = properties.getProperty("openengsb.hostIp");
+        } else {
+            openengsbHostIp = "127.0.0.1";
+        }
+    }
+
+    private static void initOpenEngSBPassword(Properties properties) throws Exception {
+        if (properties.getProperty("openengsb.password") != null) {
+            openengsbPassword = properties.getProperty("openengsb.password");
+        } else {
+            throw new Exception("OpenEngSb Password (parameter 'openengsb.password') must be set.");
+        }
+    }
+
+    private static void initOpenEngSBUser(Properties properties) throws Exception {
+        if (properties.getProperty("openengsb.user") != null) {
+            openengsbUser = properties.getProperty("openengsb.user");
+        } else {
+            throw new Exception("OpenEngSb User (parameter 'openengsb.user') must be set.");
+        }
+    }
+
+    private static void initDomainId(Properties properties) throws Exception {
+        if (properties.getProperty("openengsb.connection.domainId") != null) {
+            domainId = properties.getProperty("openengsb.connection.domainId");
+        } else {
+            throw new Exception("OpenEngSb DomainId (parameter 'openengsb.connection.domainId') must be set.");
+        }
+    }
+
+    private static void initOpenEngSBContext(Properties properties) throws Exception {
+        if (properties.getProperty("openengsb.context") != null) {
+            openEngSBContext = properties.getProperty("openengsb.context");
+        } else {
+            throw new Exception("OpenEngSb Context (parameter 'openengsb.context') must be set.");
+        }
+    }
+
+    private static void initWorkingDirectory(Properties properties) throws Exception {
+        if (properties.getProperty("working.dir") != null) {
+            String workingDir = properties.getProperty("working.dir");
+            workingDirFile = new File(workingDir);
+            if (!workingDirFile.isDirectory()) {
+                throw new Exception("Defined WorkingDirectory \"" + workingDir + "\" does not exist.");
             }
+        } else {
+            throw new Exception("WorkingDirectory (parameter 'working.dir') must be set.");
+        }
+    }
+
+    private static void initXlinkServerURL(Properties properties) throws Exception {
+        if (properties.getProperty("xlink.xlinkServerURL") != null) {
+            xlinkServerURL = properties.getProperty("xlink.xlinkServerURL");
+        } else {
+            throw new Exception("XLinkUrl (parameter 'xlink.xlinkServerURL') must be set.");
         }
     }
 

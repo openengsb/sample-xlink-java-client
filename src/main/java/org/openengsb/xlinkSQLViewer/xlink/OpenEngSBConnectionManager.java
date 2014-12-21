@@ -38,6 +38,7 @@ public class OpenEngSBConnectionManager {
     private final String programname;
     private final String openengsbUser;
     private final String openengsbPassword;
+    private final String sqlCodeDomainVersion;
 
     /** Id of the registered OpenEngSB-Connector */
     private String connectorUUID;
@@ -56,9 +57,8 @@ public class OpenEngSBConnectionManager {
     /** Only possible OpenEngSBConnectionManager instance */
     private static OpenEngSBConnectionManager instance = null;
 
-    private OpenEngSBConnectionManager(String xlinkServerURL, String domainId,
-            String programname, String openengsbUser, String openengsbPassword,
-            String hostIp) {
+    private OpenEngSBConnectionManager(String xlinkServerURL, String domainId, String programname,
+            String openengsbUser, String openengsbPassword, String hostIp, String sqlCodeDomainVersion) {
         super();
         this.xlinkServerURL = xlinkServerURL;
         this.domainId = domainId;
@@ -67,16 +67,17 @@ public class OpenEngSBConnectionManager {
         this.hostIp = hostIp;
         this.openengsbUser = openengsbUser;
         this.openengsbPassword = openengsbPassword;
+        this.sqlCodeDomainVersion = sqlCodeDomainVersion;
     }
 
     /**
      * Initializes the Connectors only instance.
      */
-    public static void initInstance(String xlinkBaseUrl, String domainId,
-            String programname, String openengsbUser, String openengsbPassword,
-            String hostIp) {
-        instance = new OpenEngSBConnectionManager(xlinkBaseUrl, domainId,
-                programname, openengsbUser, openengsbPassword, hostIp);
+    public static void initInstance(String xlinkBaseUrl, String domainId, String programname, String openengsbUser,
+        String openengsbPassword, String hostIp, String sqlCodeDomainVersion) {
+        instance =
+            new OpenEngSBConnectionManager(xlinkBaseUrl, domainId, programname, openengsbUser, openengsbPassword,
+                    hostIp, sqlCodeDomainVersion);
     }
 
     /**
@@ -84,8 +85,7 @@ public class OpenEngSBConnectionManager {
      */
     public static OpenEngSBConnectionManager getInstance() {
         if (instance == null) {
-            logger
-                    .warn("getInstance():OpenEngSBConnectionManager was not initialized.");
+            logger.warn("getInstance():OpenEngSBConnectionManager was not initialized.");
         }
         return instance;
     }
@@ -95,11 +95,9 @@ public class OpenEngSBConnectionManager {
      * 
      * @throws DomainNotLinkableException
      */
-    public void connectToOpenEngSbWithXLink(SqlViewerGUI gui)
-            throws JMSException, ConnectorValidationFailedException {
+    public void connectToOpenEngSbWithXLink(SqlViewerGUI gui) throws JMSException, ConnectorValidationFailedException {
         /* Create/Register the connector */
-        jmsConfig = new JmsProtocolHandler(xlinkServerURL,
-                "sample-xlink-java-client");
+        jmsConfig = new JmsProtocolHandler(xlinkServerURL, "sample-xlink-java-client");
         domainFactory = new ProxyConnectorFactory(jmsConfig, openengsbUser, new Password(openengsbPassword));
         connectorUUID = domainFactory.createConnector(domainId);
         LinkableConnector handler = new LinkableConnector(gui, domainFactory);
@@ -131,7 +129,7 @@ public class OpenEngSBConnectionManager {
         views[0] = new XLinkConnectorView(SqlViewerGUI.viewId, SqlViewerGUI.viewName, descriptions);
 
         modelsViews[0] =
- new ModelViewMapping(new ModelDescription(SQLCreate.class.getName(), "3.0.0.M2"), views);
+            new ModelViewMapping(new ModelDescription(SQLCreate.class.getName(), sqlCodeDomainVersion), views);
 
         return modelsViews;
     }
